@@ -1,0 +1,57 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+Libraries I may use called
+```{r}
+
+library(tidyverse)
+# install for visualizations 
+library(ggplot2)
+# install to combine date and time
+library(lubridate)
+# for melting a df
+library(reshape)
+
+```
+Reading in the first dataset, perceived health status.
+ 
+```{r}
+perceived_health_status <- read_csv("../data/perceived_health_status.csv")
+```
+Inspecting the data.
+
+```{r}
+perceived_health_status %>% view()
+```
+
+Filtering.
+
+```{r}
+perceived_health_status %>% 
+  filter(TIME_PERIOD == 2022) %>% 
+  filter(REF_AREA == "AUT") %>% 
+  filter(Sex == "Total") %>% 
+  filter(Age == "15 years or over")  
+```
+Explore the time periods the data covers
+
+```{r}
+
+sort(unique(perceived_health_status$TIME_PERIOD))
+
+```
+
+
+```{r}
+
+barplot(table(perceived_health_status$TIME_PERIOD), main = "number of observations of year in the data")
+
+```
+As it appears that after 2007, the number of observations are more significant in number, I will limit my data to 2007 and later. But, since it appears the number of observations drops off in 2024, I will limit my data to a range of 2007-2023.
+
+```{r}
+
+# input code to limit year range in perceived health status dataset here
+
+```
