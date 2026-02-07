@@ -18,12 +18,33 @@ Reading in the first dataset, perceived health status.
  
 ```{r}
 perceived_health_status <- read_csv("../data/perceived_health_status.csv")
+dnmk <- read_csv("../data/denmark_only_phs.csv")
+perceived_health_status_once <- read_csv("../data/perceived_health_status_once.csv")
+
 ```
-Inspecting the data.
+Inspecting the denmark only data:
 
 ```{r}
-perceived_health_status
+dnmk %>% 
+  filter(Sex == "Total")
 ```
+
+It appears that then 
+
+
+Inspecting the perceived health data:
+
+```{r}
+perceived_health_status %>% 
+  filter(`Reference area` == "Denmark")
+```
+
+Inspect original perceived health data:
+```{r}
+perceived_health_status_once%>% 
+  filter(`Reference area` == "Denmark")
+```
+
 
 Filtering.
 
@@ -48,7 +69,18 @@ phs <- perceived_health_status %>%
   # filter(Age == "15 years or over")
 
 phs
+
 ```
+It turns out that Denmark's data comes only from a population of 15-24 year old, which would be excluded when I filter for age range collective/Total.
+```{r}
+
+perceived_health_status_once %>% 
+  filter(TIME_PERIOD == c(2007:2023)) %>% 
+  filter(Sex == "Total") %>% 
+  filter(`Reference area` == "Denmark")
+
+```
+
 
 Inspect the dataset for the number of years it covers.
 
@@ -119,8 +151,8 @@ sort(unique(education_levels_three$STATISTICAL_OPERATION))
 I want to use the observed values and not the standard error values at this time. 
 ```{r}
 
-phs_obs <- phs %>% 
-  filter(educ)
+# phs_obs <- phs %>% 
+  # filter()
 
 ```
 
