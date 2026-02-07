@@ -38,56 +38,94 @@ perceived_health_status_stripped <- perceived_health_status %>%
 perceived_health_status_stripped
 
 ```
-Explore the time periods the data covers
+As it appears that after 2007, the number of observations are more significant in number, I will limit my data to 2007 and later. But, since it appears the number of observations drops off in 2024, I will limit my data to a range of 2007-2023. As well, I want to capture all genders and ages. 
 
 ```{r}
-phs_once <- perceived_health_status %>% 
-  filter(Sex == "Total") %>% 
-  filter(Age == "15 years or over")
+# input code to limit year range, age range, and gender in perceived health status dataset
+phs <- perceived_health_status %>% 
+  filter(TIME_PERIOD == c(2007:2023)) %>% 
+  filter(Sex == "Total") #%>% 
+  # filter(Age == "15 years or over")
 
-phs_once
+phs
 ```
 
+Inspect the dataset for the number of years it covers.
 
 ```{r}
 
-sort(unique(phs_once$TIME_PERIOD))
+barplot(table(perceived_health_status$TIME_PERIOD), main = "number of observations of year in the data")
+
+
+```
+Inspecting the data for balance in the health status column.
+
+```{r}
+
+phs %>% 
+  group_by(HEALTH_STATUS) %>% 
+  summarize(n=n())
 
 ```
 
+Which countries are most heavily represented in the data? Denmark was selected to be included I will download a Denmark only data and investigate why it is no longer located in this data. 
 
 ```{r}
 
-barplot(table(phs_once$TIME_PERIOD), main = "number of observations of year in the data")
-
-```
-As it appears that after 2007, the number of observations are more significant in number, I will limit my data to 2007 and later. But, since it appears the number of observations drops off in 2024, I will limit my data to a range of 2007-2023.
-
-```{r}
-
-# input code to limit year range in perceived health status dataset here
-
-```
-
-
-```{r}
-
-education_level <- read_csv("../data/educational_attainment_distribution_age_gender.csv")
-education_levels_defined <- read_csv("../data/educational_attainment_distribution.csv")
-education_levels_three<- read_csv("../data/educational_attainment.csv")
-wellbeing_social<- read_csv("../data/current_wellbeing_exp.csv")
-
+phs %>% 
+  group_by(`Reference area`) %>%
+  summarize(n=n())
 
 ```
 
 ```{r}
-
-education_level
+phs %>% 
+  group_by(AGE) %>%
+  summarize(n=n())
 
 ```
+
+
+
+
+
 ```{r}
-education_levels_defined
+
+# education_level <- read_csv("../data/educational_attainment_distribution_age_gender.csv")
+# education_levels_defined <- read_csv("../data/educational_attainment_distribution.csv")
+education_levels_three <- read_csv("../data/educational_attainment.csv")
+
 ```
+
+```{r}
+
+# ISCED11A_5T8 = Tertiary education
+# ISCED11A_3_4 = Upper secondary or post-secondary non-tertiary education
+# ISCED11A_0T2 = Below upper secondary education
+education_levels_three
+
+```
+Verify that there are simply three categories for the education level attained and  Education attainment level columns
+```{r}
+
+sort(unique(education_levels_three$ATTAINMENT_LEV))
+sort(unique(education_levels_three$`Educational attainment level`))
+
+```
+
+```{r}
+sort(unique(education_levels_three$STATISTICAL_OPERATION))
+```
+I want to use the observed values and not the standard error values at this time. 
+```{r}
+
+phs_obs <- phs %>% 
+  filter(educ)
+
+```
+
+
+
 ```{r}
 el_third <- education_levels_three %>% 
   filter(Sex == "Total") %>% 
@@ -117,7 +155,7 @@ el_secondary
 
 ```{r}
 # sort(unique(el_once$OBS_VALUE))
-
+wellbeing_social<- read_csv("../data/current_wellbeing_exp.csv")
 
 ```
 
@@ -171,5 +209,14 @@ wellbeing_social %>%
   filter(TIME_PERIOD == 2022) %>% 
   filter(REF_AREA == "AUT") #%>% 
   # filter(Unit)
+```
+
+```{r}
+
+
+```
+
+```{r}
+
 ```
 
