@@ -22,30 +22,43 @@ perceived_health_status <- read_csv("../data/perceived_health_status.csv")
 Inspecting the data.
 
 ```{r}
-perceived_health_status %>% view()
+perceived_health_status
 ```
 
 Filtering.
 
 ```{r}
-perceived_health_status %>% 
+
+perceived_health_status_stripped <- perceived_health_status %>% 
   filter(TIME_PERIOD == 2022) %>% 
   filter(REF_AREA == "AUT") %>% 
   filter(Sex == "Total") %>% 
   filter(Age == "15 years or over")  
+
+perceived_health_status_stripped
+
 ```
 Explore the time periods the data covers
 
 ```{r}
+phs_once <- perceived_health_status %>% 
+  filter(Sex == "Total") %>% 
+  filter(Age == "15 years or over")
 
-sort(unique(perceived_health_status$TIME_PERIOD))
+phs_once
+```
+
+
+```{r}
+
+sort(unique(phs_once$TIME_PERIOD))
 
 ```
 
 
 ```{r}
 
-barplot(table(perceived_health_status$TIME_PERIOD), main = "number of observations of year in the data")
+barplot(table(phs_once$TIME_PERIOD), main = "number of observations of year in the data")
 
 ```
 As it appears that after 2007, the number of observations are more significant in number, I will limit my data to 2007 and later. But, since it appears the number of observations drops off in 2024, I will limit my data to a range of 2007-2023.
@@ -55,3 +68,108 @@ As it appears that after 2007, the number of observations are more significant i
 # input code to limit year range in perceived health status dataset here
 
 ```
+
+
+```{r}
+
+education_level <- read_csv("../data/educational_attainment_distribution_age_gender.csv")
+education_levels_defined <- read_csv("../data/educational_attainment_distribution.csv")
+education_levels_three<- read_csv("../data/educational_attainment.csv")
+wellbeing_social<- read_csv("../data/current_wellbeing_exp.csv")
+
+
+```
+
+```{r}
+
+education_level
+
+```
+```{r}
+education_levels_defined
+```
+```{r}
+el_third <- education_levels_three %>% 
+  filter(Sex == "Total") %>% 
+  filter(Age == "From 25 to 64 years") %>% 
+  filter(TIME_PERIOD == 2010) %>% 
+  filter(OBS_STATUS == "A") %>% 
+  filter(REF_AREA == "AUT") %>% 
+  filter(STATISTICAL_OPERATION == "OBS")
+
+el_third
+
+```
+
+
+```{r}
+
+el_secondary <- education_levels_defined %>% 
+  filter(Sex == "Total") %>% 
+  filter(Age == "From 25 to 64 years") %>% 
+  filter(TIME_PERIOD == 2010) %>% 
+  filter(OBS_STATUS == "A") %>% 
+  filter(REF_AREA == "AUT")
+
+el_secondary
+
+```
+
+```{r}
+# sort(unique(el_once$OBS_VALUE))
+
+
+```
+
+```{r}
+
+# sort(unique(el_once$`Educational attainment level`))
+
+
+
+```
+
+```{r}
+# sort(unique(el_secondary$`Educational attainment level`))
+```
+
+```{r}
+
+# el_once   %>%  
+  # group_by(`Educational attainment level`) %>%
+  # summarize(n = n())
+
+```
+
+
+```{r}
+
+# barplot(table(el_once$`Educational attainment level`), main = "number of observations of that education level in the data")
+
+```
+
+
+```{r}
+
+safety_regions <- read_csv("../data/safety_regions.csv")
+
+
+```
+```{r}
+safety_regions %>% 
+  filter(TIME_PERIOD == 2010) %>% 
+  filter(REF_AREA == "AUT") #%>% 
+  # filter(Sex == "Total") %>% 
+  # filter(Age == "15 years or over")  
+
+
+```
+
+```{r}
+
+wellbeing_social %>% 
+  filter(TIME_PERIOD == 2022) %>% 
+  filter(REF_AREA == "AUT") #%>% 
+  # filter(Unit)
+```
+
