@@ -14,12 +14,14 @@ library(lubridate)
 library(reshape)
 
 ```
+### Perceived Health Status
+
 Reading in the first dataset, perceived health status.
  
 ```{r}
 perceived_health_status <- read_csv("../data/perceived_health_status.csv")
-dnmk <- read_csv("../data/denmark_only_phs.csv")
-perceived_health_status_once <- read_csv("../data/perceived_health_status_once.csv")
+# dnmk <- read_csv("../data/denmark_only_phs.csv")
+# perceived_health_status_once <- read_csv("../data/perceived_health_status_once.csv")
 
 ```
 Inspecting the denmark only data:
@@ -44,6 +46,9 @@ Inspect original perceived health data:
 perceived_health_status_once%>% 
   filter(`Reference area` == "Denmark")
 ```
+```{r}
+perceived_health_status
+```
 
 
 Filtering.
@@ -59,30 +64,45 @@ perceived_health_status_stripped <- perceived_health_status %>%
 perceived_health_status_stripped
 
 ```
-As it appears that after 2007, the number of observations are more significant in number, I will limit my data to 2007 and later. But, since it appears the number of observations drops off in 2024, I will limit my data to a range of 2007-2023. As well, I want to capture all genders and ages. 
+As it appears that after 2007, the number of observations are more significant in number, I will limit my data to 2007 and later. But, since it appears the number of observations drops off in 2024, I will limit my data to a range of 2007-2023. As well, I want to capture all genders and ages. (Corrected "==" to be "%in%" and that corrected much the problem I was running into.)
 
 ```{r}
-# input code to limit year range, age range, and gender in perceived health status dataset
+
+# input code to limit year range, age range, and gender in perceived health status data
+
 phs <- perceived_health_status %>% 
-  filter(TIME_PERIOD == c(2007:2023)) %>% 
-  filter(Sex == "Total") #%>% 
-  # filter(Age == "15 years or over")
+  filter(TIME_PERIOD %in% c(2007:2023)) %>% 
+  filter(Sex == "Total") %>% 
+  filter(Age == "15 years or over")
 
 phs
 
 ```
-It turns out that Denmark's data comes only from a population of 15-24 year old, which would be excluded when I filter for age range collective/Total.
+It turns out that Denmark's data comes only from a population of 15-24 year old, which would be excluded when I filter for age range collective/Total. (Corrected "==" to be "%in%" which corrected what I was seeing.)
+
 ```{r}
 
 perceived_health_status_once %>% 
-  filter(TIME_PERIOD == c(2007:2023)) %>% 
+  # filter(TIME_PERIOD == 2007) %>% 
+  filter(TIME_PERIOD %in% c(2007:2023)) %>% 
   filter(Sex == "Total") %>% 
-  filter(`Reference area` == "Denmark")
+  filter(AGE == "Y_GE15") #%>%
+  # filter(`Reference area` == "Denmark")
+
+```
+
+```{r}
+
+sort(unique(perceived_health_status_once$Age))
+
+perceived_health_status_once %>% 
+  group_by(AGE) %>%
+  summarize(n=n())
 
 ```
 
 
-Inspect the dataset for the number of years it covers.
+Inspect the data for the number of years it covers.
 
 ```{r}
 
@@ -90,6 +110,12 @@ barplot(table(perceived_health_status$TIME_PERIOD), main = "number of observatio
 
 
 ```
+
+Inspect the data for the number of age categories it covers.
+```{r}
+barplot(table(perceived_health_status$Age), main = "number of observations of age groups in the data")
+```
+
 Inspecting the data for balance in the health status column.
 
 ```{r}
@@ -117,9 +143,20 @@ phs %>%
 
 ```
 
+The final state of my Perceived Health Status data will be:
+```{r}
+
+phs
+
+```
 
 
 
+### Education Levels
+
+
+
+Reading in the second dataset, education levels.
 
 ```{r}
 
@@ -128,6 +165,21 @@ phs %>%
 education_levels_three <- read_csv("../data/educational_attainment.csv")
 
 ```
+
+Early data exploration in the education data
+
+```{r}
+el_third <- education_levels_three %>% 
+  filter(Sex == "Total") %>% 
+  filter(Age == "From 25 to 64 years") %>% 
+  filter(TIME_PERIOD == 2010) %>% 
+  filter(OBS_STATUS == "A") %>% 
+  filter(REF_AREA == "AUT") %>% 
+  filter(STATISTICAL_OPERATION == "OBS")
+
+el_third
+```
+
 
 ```{r}
 
@@ -151,50 +203,116 @@ sort(unique(education_levels_three$STATISTICAL_OPERATION))
 I want to use the observed values and not the standard error values at this time. 
 ```{r}
 
-# phs_obs <- phs %>% 
-  # filter()
-
-```
-
-
-
-```{r}
-el_third <- education_levels_three %>% 
-  filter(Sex == "Total") %>% 
-  filter(Age == "From 25 to 64 years") %>% 
-  filter(TIME_PERIOD == 2010) %>% 
-  filter(OBS_STATUS == "A") %>% 
-  filter(REF_AREA == "AUT") %>% 
+education_levels_three %>% 
   filter(STATISTICAL_OPERATION == "OBS")
 
-el_third
+```
+
+I want to see the representation of countries in the data. Certain countries are significantly under represented.
+
+```{r}
+barplot(table(education_levels_three$`Reference area`), main = "number of observations of countries in the data")
+
+```
+
+```{r}
+barplot(table(education_levels_three$TIME_PERIOD), main = "number of observations of year in the data")
+
+```
+
+check to see which years are present in the data. Base on the lack of data in the years prior to about 1998, I will limit the dataset to 1998-2024.
+
+```{r}
+
+sort(unique(education_levels_three$TIME_PERIOD))
+
+education_levels_three_time <- education_levels_three %>% 
+  filter(TIME_PERIOD %in% c(1998:2024))
 
 ```
 
 
+
+
+I would like to discover which of the countries are under represented. 
+
+```{r}
+education_levels_three_time %>% 
+  group_by(`Reference area`) %>%
+  summarize(n=n())
+```
+
+
+I want to drop any countries whose count is less than 1800. 
+
 ```{r}
 
-el_secondary <- education_levels_defined %>% 
+# count the frequency of each country
+country_count <- table(education_levels_three_time$`Reference area`)
+
+# I do not want any fewer rows for a country than this
+num_in_data <- 1800
+
+# which countries match or exceed that number
+countries_to_keep <- names(country_count[country_count > num_in_data])
+
+# filter the dataset to keep only rows of countries who are 
+#represented in the data a certain number of times or more
+education_levels_three_time_countries <- education_levels_three_time[education_levels_three_time$`Reference area` %in% countries_to_keep, ]
+
+education_levels_three_time_countries 
+
+
+```
+
+Check out which ages are available to filter by.
+
+```{r}
+sort(unique(education_levels_three_time_countries$Age))
+```
+
+Check number of times each age range is represented in the data
+```{r}
+
+barplot(table(education_levels_three_time_countries$Age), main = "number of observations of age in the data")
+
+
+```
+
+
+Filter using all of the methods left that I want to filter by: all genders, ages, as well as only observed data, not the standard error.
+
+```{r}
+
+el_filtered <- education_levels_three_time_countries %>% 
   filter(Sex == "Total") %>% 
   filter(Age == "From 25 to 64 years") %>% 
-  filter(TIME_PERIOD == 2010) %>% 
-  filter(OBS_STATUS == "A") %>% 
-  filter(REF_AREA == "AUT")
-
-el_secondary
+  filter(STATISTICAL_OPERATION == "OBS")
 
 ```
 
+The final state of my education level data will be:
+
 ```{r}
-# sort(unique(el_once$OBS_VALUE))
+el_filtered
+```
+
+### Social and Community connection pulled from the Wellbeing dataset
+
+
+
+```{r}
+
 wellbeing_social<- read_csv("../data/current_wellbeing_exp.csv")
 
 ```
 
+
+
 ```{r}
 
-# sort(unique(el_once$`Educational attainment level`))
-
+# find unique values for Measure column
+sort(unique(wellbeing_social$Measure))
 
 
 ```
