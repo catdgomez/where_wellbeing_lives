@@ -12,6 +12,7 @@ library(ggplot2)
 library(lubridate)
 # for melting a df
 library(reshape)
+library(data.table)
 
 ```
 ### Perceived Health Status
@@ -282,9 +283,15 @@ Filter using all of the methods left that I want to filter by: all genders, ages
 el <- education_levels_three_time_countries %>% 
   filter(Sex == "Total") %>% 
   filter(Age == "From 25 to 64 years") %>% 
+  filter(OBS_STATUS == "A") %>%
   filter(STATISTICAL_OPERATION == "OBS")
 
 ```
+
+```{r}
+el
+```
+
 
 The final state of my education level data will be:
 
@@ -543,8 +550,6 @@ The final dataset from safety data I have chosen are as follows:
 safety[1:2,]
 ```
 
-
-
 Final datasets are:
 
 ```{r}
@@ -569,12 +574,174 @@ safety[1:2,]
 
 ```
 
+
+
+###Merging data sets together into one
+
+Order the data's country column (REF_AREA) alphabetically. 
+
 ```{r}
 
+# Order the data's country column (REF_AREA) alphabetically.
+
+phs_v1_bridge <- phs[order(phs$`Reference area`),] 
+phs_v1 <- phs_v1_bridge[1:100, ]
+
+el_v1_bridge <- el[order(el$`Reference area`),]
+el_v1 <- el_v1_bridge[1:250, ]
+
+safety_v1_bridge <- safety[order(safety$`Reference area`),]
+safety_v1 <- safety_v1_bridge[1:250, ]
+
+social_support_or_lack_v1_bridge <- social_support_or_lack[order(social_support_or_lack$`Reference area`),]
+social_support_or_lack_v1 <- social_support_or_lack_v1_bridge[1:250, ]
+
+lonely_v1_bridge <- lonely[order(lonely$`Reference area`),]
+lonely_v1 <- lonely_v1_bridge[1:73,]
+
+phs_v1
+el_v1
+safety_v1
+social_support_or_lack_v1
+lonely_v1
+
+```
+
+rename columns  
+
+```{r}
+
+# rename
+# colnames(trSamp) <- "newname2"
+phs_v2 <- rename(phs_v1, replace = c(`Reference area` = "Reference_area", `Frequency of observation` = "Freq_of_obs_phs", `Unit of measure` = "Unit_of_measure_phs", `Health status` = "Health_status", "OBS_VALUE" = "OBS_VALUE_PHS"))
+
+
+el_v2 <- rename(el_v1, replace = c(`Reference area` = "Reference_area", `Frequency of observation` = "Freq_of_obs_el", `Unit of measure` = "Unit_of_measure_el", `Educational attainment level` = "Edu_attainment_lvl", "OBS_VALUE" = "OBS_VALUE_EL"))
+
+safety_v2 <- rename(safety_v1, replace = c(`Reference area` = "Reference_area", `Frequency of observation` = "Freq_of_obs_sfty", `Unit of measure` = "Unit_of_measure_sfty", "Measure" = "Measure_safety", "OBS_VALUE" = "OBS_VALUE_SAFETY", "MEASURE" = "MEASURE_SAFETY"))
+
+social_support_or_lack_v2 <- rename(social_support_or_lack_v1, replace = c(`Reference area` = "Reference_area", `Unit of measure` = "Unit_of_measure_social", "Measure" = "Measure_social", "OBS_VALUE" = "OBS_VALUE_SOCIAL", "MEASURE" = "MEASURE_SOCIAL"))
 
 ```
 
 ```{r}
+social_support_or_lack_v2[1:2,]
+```
 
+
+drop columns not anticipated to be needed or subset only the columns I will require
+
+
+```{r}
+# Columns to keep
+
+phs_columns_to_keep <- c("REF_AREA", "Reference_area", "TIME_PERIOD", "OBS_VALUE_PHS", "Health_status", "HEALTH_STATUS")
+
+el_columns_to_keep <- c("REF_AREA", "Reference_area", "TIME_PERIOD", "OBS_VALUE_EL", "Edu_attainment_lvl", "ATTAINMENT_LEV")
+
+safety_columns_to_keep <- c("REF_AREA", "Reference_area", "TIME_PERIOD", "OBS_VALUE_SAFETY", "Measure_safety", "MEASURE_SAFETY")
+
+social_columns_to_keep <- c("REF_AREA", "Reference_area", "TIME_PERIOD", "OBS_VALUE_SOCIAL", "Measure_social", "MEASURE_SOCIAL")
+
+phs_v3 <- subset(phs_v2, select = phs_columns_to_keep)
+
+el_v3 <- subset(el_v2, select = el_columns_to_keep)
+
+safety_v3 <- subset(safety_v2, select = safety_columns_to_keep)
+
+social_support_or_lack_v3 <- subset(social_support_or_lack_v2, select = social_columns_to_keep)
+
+```
+
+
+```{r}
+
+phs_v3
+
+el_v3
+
+safety_v3
+
+social_support_or_lack_v3
+
+```
+
+Merge all three datasets together using purr package, reduce
+
+```{r}
+
+list(phs_v3, el_v3, safety_v3, social_support_or_lack_v3) %>% 
+  reduce(left_join, by = c("Reference_area", "TIME_PERIOD", "REF_AREA"))
+
+
+```
+
+
+
+
+Merge the ordered data sets on the country (REF_AREA) and year (TIME_PERIOD) columns.
+
+```{r}
+
+# merge two datasets by country and year
+phs_el_v1 <- merge(phs_v3, el_v3, by = c("Reference_area", "TIME_PERIOD", "REF_AREA"))
+
+phs_el_v1
+
+```
+
+inspect all column names
+
+```{r}
+col_names <- names(phs_el_v1)
+
+col_names
+
+```
+
+####
+
+
+```{r}
+
+```
+
+Order country column for safety data
+
+```{r}
+
+  
+
+```
+
+
+```{r}
+
+# df_wide <- phs_el_v1 %>%
+#   pivot_wider(
+#     names_from = "REF_AREA",
+#     values_from = c("OBS", "")
+#   )
+
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
 ```
 
