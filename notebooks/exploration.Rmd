@@ -555,10 +555,10 @@ Final datasets are:
 ```{r}
 
 # perceived health status, subjective survey of good, fair, and bad health
-phs[1:2,]
+phs[1:2, ]
 
 # selected all adults from age, and all genders, and only observed values no standard error values
-el[1:2,]
+el[1:2, ]
 
 # measured as a percentage fo the adult population and is well represented across all years in selected data 
 social_support_or_lack[1:2, ]
@@ -574,47 +574,42 @@ safety[1:2,]
 
 ```
 
-
-
 ###Merging data sets together into one
 
 Order the data's country column (REF_AREA) alphabetically. 
 
 ```{r}
 
-# Order the data's country column (REF_AREA) alphabetically.
+# Order the data's country column (`Reference area`) alphabetically.
 
-phs_v1_bridge <- phs[order(phs$`Reference area`),] 
-phs_v1 <- phs_v1_bridge[1:100, ]
+phs_v1 <- phs[order(phs$`Reference area`),] 
 
-el_v1_bridge <- el[order(el$`Reference area`),]
-el_v1 <- el_v1_bridge[1:250, ]
+el_v1 <- el[order(el$`Reference area`),]
 
-safety_v1_bridge <- safety[order(safety$`Reference area`),]
-safety_v1 <- safety_v1_bridge[1:250, ]
+safety_v1 <- safety[order(safety$`Reference area`),]
 
-social_support_or_lack_v1_bridge <- social_support_or_lack[order(social_support_or_lack$`Reference area`),]
-social_support_or_lack_v1 <- social_support_or_lack_v1_bridge[1:250, ]
+social_support_or_lack_v1 <- social_support_or_lack[order(social_support_or_lack$`Reference area`),]
 
-lonely_v1_bridge <- lonely[order(lonely$`Reference area`),]
-lonely_v1 <- lonely_v1_bridge[1:73,]
+lonely_v1 <- lonely[order(lonely$`Reference area`),]
 
-phs_v1
-el_v1
-safety_v1
-social_support_or_lack_v1
-lonely_v1
+satisfaction_life_rels_v1 <- satisfaction_life_rels[order(satisfaction_life_rels$`Reference area`),]
+ 
+
+
+phs_v1 # percentage of the population
+el_v1 # percentage of the population
+safety_v1 # measured in cases per 100,000 persons
+social_support_or_lack_v1 # percentage of the population
+lonely_v1 # percentage of the population
+satisfaction_life_rels_v1[1:2,]
 
 ```
 
-rename columns  
+rename columns
 
 ```{r}
 
-# rename
-# colnames(trSamp) <- "newname2"
 phs_v2 <- rename(phs_v1, replace = c(`Reference area` = "Reference_area", `Frequency of observation` = "Freq_of_obs_phs", `Unit of measure` = "Unit_of_measure_phs", `Health status` = "Health_status", "OBS_VALUE" = "OBS_VALUE_PHS"))
-
 
 el_v2 <- rename(el_v1, replace = c(`Reference area` = "Reference_area", `Frequency of observation` = "Freq_of_obs_el", `Unit of measure` = "Unit_of_measure_el", `Educational attainment level` = "Edu_attainment_lvl", "OBS_VALUE" = "OBS_VALUE_EL"))
 
@@ -622,10 +617,14 @@ safety_v2 <- rename(safety_v1, replace = c(`Reference area` = "Reference_area", 
 
 social_support_or_lack_v2 <- rename(social_support_or_lack_v1, replace = c(`Reference area` = "Reference_area", `Unit of measure` = "Unit_of_measure_social", "Measure" = "Measure_social", "OBS_VALUE" = "OBS_VALUE_SOCIAL", "MEASURE" = "MEASURE_SOCIAL"))
 
+lonely_v2 <- rename(lonely_v1, replace = c(`Reference area` = "Reference_area", "OBS_VALUE" = "OBS_VALUE_LONELY", "Measure" = "Measure_lonely", "MEASURE" = "MEASURE_LONELY"))
+
+satisfaction_life_rels_v2 <- rename(satisfaction_life_rels_v1, replace = c(`Reference area` = "Reference_area", "OBS_VALUE" = "OBS_VALUE_SAT", "Measure" = "Measure_sat", "MEASURE" = "MEASURE_SAT"))
+
 ```
 
 ```{r}
-social_support_or_lack_v2[1:2,]
+satisfaction_life_rels_v2[1:2,]
 ```
 
 
@@ -636,20 +635,18 @@ drop columns not anticipated to be needed or subset only the columns I will requ
 # Columns to keep
 
 phs_columns_to_keep <- c("REF_AREA", "Reference_area", "TIME_PERIOD", "OBS_VALUE_PHS", "Health_status", "HEALTH_STATUS")
-
 el_columns_to_keep <- c("REF_AREA", "Reference_area", "TIME_PERIOD", "OBS_VALUE_EL", "Edu_attainment_lvl", "ATTAINMENT_LEV")
-
 safety_columns_to_keep <- c("REF_AREA", "Reference_area", "TIME_PERIOD", "OBS_VALUE_SAFETY", "Measure_safety", "MEASURE_SAFETY")
-
 social_columns_to_keep <- c("REF_AREA", "Reference_area", "TIME_PERIOD", "OBS_VALUE_SOCIAL", "Measure_social", "MEASURE_SOCIAL")
+lonely_columns_to_keep <- c("REF_AREA", "Reference_area", "TIME_PERIOD", "OBS_VALUE_LONELY", "Measure_lonely", "MEASURE_LONELY")
+satisfaction_columns_to_keep <- c("REF_AREA", "Reference_area", "TIME_PERIOD", "OBS_VALUE_SAT", "Measure_sat", "MEASURE_SAT")
 
 phs_v3 <- subset(phs_v2, select = phs_columns_to_keep)
-
 el_v3 <- subset(el_v2, select = el_columns_to_keep)
-
 safety_v3 <- subset(safety_v2, select = safety_columns_to_keep)
-
 social_support_or_lack_v3 <- subset(social_support_or_lack_v2, select = social_columns_to_keep)
+lonely_v3 <- subset(lonely_v2, select = lonely_columns_to_keep)
+satisfaction_life_rels_v3 <- subset(satisfaction_life_rels_v2, select = satisfaction_columns_to_keep)
 
 ```
 
@@ -664,49 +661,201 @@ safety_v3
 
 social_support_or_lack_v3
 
+lonely_v3
+
+satisfaction_life_rels_v3
+
 ```
 
-Merge all three datasets together using purr package, reduce
+Pivot all data sets prior to merging them.
 
 ```{r}
 
-list(phs_v3, el_v3, safety_v3, social_support_or_lack_v3) %>% 
-  reduce(left_join, by = c("Reference_area", "TIME_PERIOD", "REF_AREA"))
+phs_pivoted <- phs_v3 %>% 
+  pivot_wider(
+    id_cols = c("REF_AREA", "Reference_area", "TIME_PERIOD"), 
+    names_from = c("HEALTH_STATUS"),
+    names_prefix = "health_status_",
+    values_from = "OBS_VALUE_PHS"
+    )
 
-
-```
-
-
-
-
-Merge the ordered data sets on the country (REF_AREA) and year (TIME_PERIOD) columns.
-
-```{r}
-
-# merge two datasets by country and year
-phs_el_v1 <- merge(phs_v3, el_v3, by = c("Reference_area", "TIME_PERIOD", "REF_AREA"))
-
-phs_el_v1
+phs_pivoted
 
 ```
-
-inspect all column names
-
-```{r}
-col_names <- names(phs_el_v1)
-
-col_names
-
-```
-
-####
 
 
 ```{r}
 
+el_pivoted <- el_v3 %>% 
+  pivot_wider(
+    id_cols = c("REF_AREA", "Reference_area", "TIME_PERIOD"), 
+    names_from = c("Edu_attainment_lvl"),
+    values_from = "OBS_VALUE_EL"
+    )
+
+
+el_pivoted
+
 ```
 
-Order country column for safety data
+
+
+
+```{r}
+
+safety_pivoted <- safety_v3 %>% 
+  pivot_wider(
+    id_cols = c("REF_AREA", "Reference_area", "TIME_PERIOD"), 
+    names_from = c("Measure_safety"),
+    values_from = "OBS_VALUE_SAFETY"
+    )
+
+
+safety_pivoted
+
+```
+
+```{r}
+
+social_support_or_lack_pivoted <- social_support_or_lack_v3 %>% 
+  pivot_wider(
+    id_cols = c("REF_AREA", "Reference_area", "TIME_PERIOD"), 
+    names_from = c("Measure_social"),
+    values_from = "OBS_VALUE_SOCIAL"
+    )
+
+social_support_or_lack_pivoted
+
+```
+
+
+```{r}
+
+lonely_pivoted <- lonely_v3 %>% 
+  pivot_wider(
+    id_cols = c("REF_AREA", "Reference_area", "TIME_PERIOD"), 
+    names_from = c("Measure_lonely"),
+    values_from = "OBS_VALUE_LONELY"
+    )
+
+lonely_pivoted
+
+```
+
+
+```{r}
+
+satisfaction_life_rels_pivoted <- satisfaction_life_rels_v3 %>% 
+  pivot_wider(
+    id_cols = c("REF_AREA", "Reference_area", "TIME_PERIOD"), 
+    names_from = c("Measure_sat"),
+    values_from = "OBS_VALUE_SAT"
+    )
+
+satisfaction_life_rels_pivoted
+
+```
+
+
+
+Merge all 6 data sets
+
+
+```{r}
+
+phs_el <- merge(
+  phs_pivoted,
+  el_pivoted,
+  by = c("REF_AREA", "Reference_area", "TIME_PERIOD"),
+  all = TRUE
+)
+
+phs_el
+
+```
+
+```{r}
+
+phs_el_safety <- merge(
+  phs_el,
+  safety_pivoted,
+  by = c("REF_AREA", "Reference_area", "TIME_PERIOD"),
+  all = TRUE
+)
+
+phs_el_safety
+
+```
+
+
+```{r}
+
+phs_el_safety_social <- merge(
+  phs_el_safety,
+  social_support_or_lack_pivoted,
+  by = c("REF_AREA", "Reference_area", "TIME_PERIOD"),
+  all = TRUE
+)
+
+phs_el_safety_social
+
+```
+
+```{r}
+
+phs_el_safety_social_lonely <- merge(
+  phs_el_safety_social,
+  lonely_pivoted,
+  by = c("REF_AREA", "Reference_area", "TIME_PERIOD"),
+  all = TRUE
+)
+
+phs_el_safety_social_lonely
+
+```
+
+```{r}
+
+phs_el_safety_social_lonely_satisfaction <- merge(
+  phs_el_safety_social_lonely,
+  satisfaction_life_rels_pivoted,
+  by = c("REF_AREA", "Reference_area", "TIME_PERIOD"),
+  all = TRUE
+)
+
+phs_el_safety_social_lonely_satisfaction
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
 
 ```{r}
 
@@ -716,12 +865,6 @@ Order country column for safety data
 
 
 ```{r}
-
-# df_wide <- phs_el_v1 %>%
-#   pivot_wider(
-#     names_from = "REF_AREA",
-#     values_from = c("OBS", "")
-#   )
 
 ```
 
