@@ -827,64 +827,52 @@ phs_el_safety_social_lonely_satisfaction
 
 ```
 
-
+Use fill from tidyr to fill, up and down, the lonely data
 
 ```{r}
 
+phs_el_safety_social_lonely_satisfaction_fill <- phs_el_safety_social_lonely_satisfaction |>
+  group_by(Reference_area) |>
+  fill(`Feeling lonely`, .direction = "updown") |>
+  ungroup()
 
+phs_el_safety_social_lonely_satisfaction_fill
 
 ```
 
 ```{r}
 
+phs_el_safety_social_lonely_satisfaction_filled <- phs_el_safety_social_lonely_satisfaction_fill |>
+  group_by(Reference_area) |>
+  fill(`Satisfaction with personal relationships`, .direction = "updown") |>
+  ungroup()
 
-```
-
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-
-
-```{r}
-
-  
+phs_el_safety_social_lonely_satisfaction_filled
 
 ```
 
 
 ```{r}
 
+df <- phs_el_safety_social_lonely_satisfaction_filled |>
+  group_by(Reference_area) |>
+  fill(`Life satisfaction`, .direction = "updown") |>
+  ungroup()
+
+df
+
 ```
 
+Final version of the dataset to be used in the shiny app.
 
 ```{r}
+
+class(df)
+
 ```
-
-
 ```{r}
+write.table(df, file = "../data/df.csv")
 ```
 
 
-```{r}
-```
-
-
-```{r}
-```
-
-
-```{r}
-```
 
