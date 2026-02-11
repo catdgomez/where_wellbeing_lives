@@ -28,8 +28,8 @@ perceived_health_status <- read_csv("../data/perceived_health_status.csv")
 Inspecting the denmark only data:
 
 ```{r}
-dnmk %>% 
-  filter(Sex == "Total")
+# dnmk %>% 
+#   filter(Sex == "Total")
 ```
 
 It appears that then 
@@ -44,8 +44,8 @@ perceived_health_status %>%
 
 Inspect original perceived health data:
 ```{r}
-perceived_health_status_once%>% 
-  filter(`Reference area` == "Denmark")
+# perceived_health_status_once%>% 
+#   filter(`Reference area` == "Denmark")
 ```
 ```{r}
 perceived_health_status
@@ -83,20 +83,20 @@ It turns out that Denmark's data comes only from a population of 15-24 year old,
 
 ```{r}
 
-perceived_health_status_once %>% 
-  filter(TIME_PERIOD %in% c(2007:2023)) %>% 
-  filter(Sex == "Total") %>% 
-  filter(AGE == "Y_GE15") 
+# perceived_health_status_once %>% 
+#   filter(TIME_PERIOD %in% c(2007:2023)) %>% 
+#   filter(Sex == "Total") %>% 
+#   filter(AGE == "Y_GE15") 
 
 ```
 
 ```{r}
 
-sort(unique(perceived_health_status_once$Age))
-
-perceived_health_status_once %>% 
-  group_by(AGE) %>%
-  summarize(n=n())
+# sort(unique(perceived_health_status_once$Age))
+# 
+# perceived_health_status_once %>% 
+#   group_by(AGE) %>%
+#   summarize(n=n())
 
 ```
 
@@ -369,21 +369,22 @@ social_support_or_lack[1:2, ]
 
 ```{r}
 
-barplot(table(social_support_or_lack$TIME_PERIOD), main = "frequencyasdf  of years in the data")
+barplot(table(social_support_or_lack$TIME_PERIOD), main = "frequency of years in the data")
+
 ```
 
 
 ```{r}
 
 # find unique values for Measure column
-sort(unique(wellbeing_social$Measure))
+sort(unique(social_wellbeing$Measure))
 
 
 ```
 How is satisfaction with personal relationships scored?
 
 ```{r}
-wellbeing_social %>% 
+social_wellbeing %>% 
   filter(Measure == "Satisfaction with personal relationships score less than 5")
 ```
 
@@ -867,12 +868,28 @@ Final version of the dataset to be used in the shiny app.
 
 ```{r}
 
-class(df)
+df %>% view()
+```
 
+```{r}
+write.csv(df, file = "../data/df.csv")
+```
+
+```{r}
+hist(df$`Feeling lonely`, xlab="lonely")
 ```
 ```{r}
-write.table(df, file = "../data/df.csv")
+
+sort(unique(df$`Feeling lonely`))
+
+
+class(df)
 ```
 
-
+```{r}
+max(df$`Feeling lonely`, na.rm = TRUE)
+```
+```{r}
+df %>% view()
+```
 
