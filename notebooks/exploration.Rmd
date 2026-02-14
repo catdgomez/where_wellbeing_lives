@@ -872,7 +872,7 @@ df %>% view()
 ```
 
 ```{r}
-write.csv(df, file = "../data/df.csv")
+# write.csv(df, file = "../data/df.csv")
 ```
 
 ```{r}
@@ -891,5 +891,6 @@ max(df$`Feeling lonely`, na.rm = TRUE)
 ```
 ```{r}
 df %>% view()
+
 ```
 

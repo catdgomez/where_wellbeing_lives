@@ -2,12 +2,17 @@ library(shiny)
 library(tidyverse)
 library(glue)
 library(DT)
+library(leaflet)
 # install.packages("RSQLite")
 library(RSQLite)
+library(dplyr, warn.conflicts = FALSE)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
 
 
 wellbeing <- read_csv("data/df.csv")
-view(wellbeing)
+
 
 # movies <- read_csv("../data/penguins.csv")
 # 

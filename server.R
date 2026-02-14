@@ -18,29 +18,22 @@ function(input, output, session) {
   
   output$scatPlot <- renderPlot({
     
+    plot_variables <- wellbeing
     
-    ggplot(wellbeing, aes(x=`Feeling lonely`, y=`Tertiary education`)) + geom_point()
+    if(input$country != "All"){
+      plot_variables <- wellbeing %>% 
+        filter(Reference_area == input$country)
+      title <- glue("{input$scatter_x} and {input$scatter_y} for {input$country}")
+    } else if(input$country == "All"){
+      plot_variables <- wellbeing
+      title <- glue("{input$scatter_x}")
+    }
+    ggplot(
+      plot_variables, aes(x=.data[[input$scatter_x]], y = .data[[input$scatter_y]])) + 
+      geom_point() +
+      labs(title = title)
     
   })
   
-  
 }
-# 
-# 
-# # Define server logic required to draw a histogram
-# function(input, output, session) {
-# 
-#     output$distPlot <- renderPlot({
-# 
-#         # generate bins based on input$bins from ui.R
-#         x    <- faithful[, 2]
-#         bins <- seq(min(x), max(x), length.out = input$bins + 1)
-# 
-#         # draw the histogram with the specified number of bins
-#         hist(x, breaks = bins, col = 'darkgray', border = 'white',
-#              xlab = 'Waiting time to next eruption (in mins)',
-#              main = 'Histogram of waiting times')
-# 
-#     })
-#     
-# }
+

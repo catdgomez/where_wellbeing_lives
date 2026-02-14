@@ -12,9 +12,26 @@ fluidPage(
                   min = 0,
                   max = 13.85,
                   value = 6),
-      selectInput("lonely", "Please select country:", 
-                  choices = wellbeing$Reference_area
-      )
+      selectInput("scatter_x",
+                  "Select Variable to Display:",
+                  choices = colnames(wellbeing)[5:17] 
+                  ),
+      selectInput("scatter_y",
+                  "Select Variable to Display:",
+                  choices = colnames(wellbeing)[5:17] 
+                  ),
+      selectInput("country", 
+                  "Please select country:", 
+                  choices = c(
+                    "All", 
+                    wellbeing %>% 
+                      distinct(Reference_area) %>% 
+                      pull() %>% 
+                      sort()
+                    )
+      ), 
+      hr(),
+      helpText("Data from Reference_area column")
       
       
     ),
