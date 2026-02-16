@@ -13,6 +13,15 @@ library(lubridate)
 # for melting a df
 library(reshape)
 library(data.table)
+library(dplyr)
+# for heatmap
+library(gapminder)
+# install.packages('reshape2')
+# for heatmap
+library(reshape2)
+library(reshape)
+library(tidyr)
+
 
 ```
 ### Perceived Health Status
@@ -668,6 +677,9 @@ satisfaction_life_rels_v3
 
 ```
 
+
+
+
 Pivot all data sets prior to merging them.
 
 ```{r}
@@ -855,12 +867,12 @@ phs_el_safety_social_lonely_satisfaction_filled
 
 ```{r}
 
-df <- phs_el_safety_social_lonely_satisfaction_filled |>
+wellbeing_df <- phs_el_safety_social_lonely_satisfaction_filled |>
   group_by(Reference_area) |>
   fill(`Life satisfaction`, .direction = "updown") |>
   ungroup()
 
-df
+wellbeing_df
 
 ```
 
@@ -868,29 +880,100 @@ Final version of the dataset to be used in the shiny app.
 
 ```{r}
 
-df %>% view()
+wellbeing_df %>% view()
 ```
 
 ```{r}
-# write.csv(df, file = "../data/df.csv")
+
 ```
 
+Histogram of wellbeing's "feeling lonely" column.
+
 ```{r}
-hist(df$`Feeling lonely`, xlab="lonely")
+hist(wellbeing_df$`Feeling lonely`, xlab="feeling lonely")
 ```
+Inspect "Feeling lonely" column and the class of the dataframe. 
+
 ```{r}
 
-sort(unique(df$`Feeling lonely`))
+sort(unique(wellbeing_df$`Feeling lonely`))
 
 
 class(df)
 ```
+Max of "Feeling lonely" column. 
 
 ```{r}
-max(df$`Feeling lonely`, na.rm = TRUE)
+max(wellbeing_df$`Feeling lonely`, na.rm = TRUE)
 ```
+inspect the dataframe.
+
 ```{r}
-df %>% view()
+wellbeing_df %>% view()
+
+```
+
+rename columns in wellbeing data.
+
+```{r}
+
+wellbeing_df_rnmd <- rename(wellbeing_df, replace = c(`Upper secondary or post-secondary non-tertiary education` = "upper_secondary_or_post_secondary_not_tertiary_education", `Tertiary education` = "tertiary_education", `Below upper secondary education` = "below_upper_secondary_education", `Motor vehicle theft` = "motor_vehicle_theft", `Mortality from transport accidents` = "mortality_from_transport_accidents", `Intentional homicides` = "intentional_homicides", `Social support` = "social_support", `Lack of social support` = "lack_of_social_support", `Feeling lonely` = "feeling_lonely", `Life satisfaction` = "life_satisfaction", `Satisfaction with personal relationships` = "satisfaction_with_personal_relationships"))
+
+```
+
+
+```{r}
+wellbeing_df_rnmd
+```
+
+Omit all NA values in wellbeing dataset and creating a csv for the dropped dataset.
+
+```{r}
+
+wellbeing_df_dropped <- na.omit(wellbeing_df_rnmd)
+wellbeing_df_dropped
+
+write.csv(wellbeing_df_dropped, file = "../data/wellbeing_df_dropped.csv")
+
+```
+
+Subset the dataframe to reflect only the columns I want to use for my heatmap. Find the correlation between the variables. Reformate that data by melting it. Create a heatmap using ggplot2.
+
+```{r}
+
+the_values <- wellbeing_df_dropped[, c("life_satisfaction", "feeling_lonely", "social_support", "intentional_homicides")]
+
+data <- cor(the_values)
+
+what_what <- melt(data)
+
+ggplot(what_what, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile() +
+  labs(title = "I'm confused",
+       x = "var1",
+       y = "var2") +
+  scale_fill_gradient2(low = "yellow", high = "red",
+                       limit = c(-1,1), name="value") +
+    geom_text(aes(Var2, Var1, label = round(value, digits = 3)), size = 3)
+
+```
+
+
+```{r}
+
+
+```
+
+```{r}
+
+
+  
+```
+
+
+```{r}
+
+
 
 ```
 

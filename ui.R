@@ -10,29 +10,31 @@ fluidPage(
   mainPanel(
     tabsetPanel(
       tabPanel(
-        "Scatterplot",
-        plotOutput("scatPlot"),
-        hr(),
-        selectInput("scatter_x",
-                    "Select Variable to Display:",
-                    choices = colnames(wellbeing)[5:17] 
-        ),
-        selectInput("scatter_y",
-                    "Select Variable to Display:",
-                    choices = colnames(wellbeing)[5:17] 
-        ),
-        selectInput("country", 
-                    "Please select country:", 
-                    choices = c(
-                      "All", 
-                      wellbeing %>% 
-                        distinct(Reference_area) %>% 
-                        pull() %>% 
-                        sort()
-                    )
-        ), 
-        helpText("Data from Reference_area column")
-      ),
+        sidebarLayout(
+          sidebarPanel(
+            "Scatterplot",
+            plotOutput("scatPlot"),
+            hr(),
+            selectInput("scatter_x",
+                        "Select Variable to Display:",
+                        choices = colnames(wellbeing)[5:17] 
+            ),
+            selectInput("scatter_y",
+                        "Select Variable to Display:",
+                        choices = colnames(wellbeing)[5:17] 
+            ),
+            selectInput("country", 
+                        "Please select country:", 
+                        choices = c(
+                          "All", 
+                          wellbeing %>% 
+                            distinct(Reference_area) %>% 
+                            pull() %>% 
+                            sort()
+                        )
+            ), 
+            helpText("Data from Reference_area column")
+          ))),
       
       tabPanel(
         "Histogram",
