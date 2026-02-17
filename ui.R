@@ -79,7 +79,7 @@ fluidPage(
         sidebarLayout(
           sidebarPanel(
             
-
+            
             selectInput("heat_country",
                         "Please select All or choose a specific country:",
                         choices = c(
@@ -105,28 +105,9 @@ fluidPage(
               "feeling lonely" = "feeling_lonely",
               "life satisfaction" = "life_satisfaction",
               "satisfaction with personal relationships" = "satisfaction_w_relationships"
-              ), selected = c("life_satisfaction", "feeling_lonely", "social_support", "intentional_homicides")
-            
-              ),
-            
-            selectInput("heat_one",
-                        "Select your first variable:",
-                        choices = colnames(wellbeing_dropped)[5:17] 
-            ),
-            selectInput("heat_two",
-                        "Select the second variable:",
-                        choices = colnames(wellbeing_dropped)[5:17] 
-            ),
-            selectInput("heat_three",
-                        "Select the third variable:",
-                        choices = colnames(wellbeing_dropped)[5:17] 
-            ),
-            selectInput("heat_four",
-                        "Select the fourth variable:",
-                        choices = colnames(wellbeing_dropped)[5:17] 
-            ),
-            helpText("Please selected 4 variables.")
-            
+            ), selected = c("life_satisfaction", "feeling_lonely", "social_support", "intentional_homicides")
+            )
+
           ),
           mainPanel(
             plotOutput("heatmapPlot")
