@@ -6,11 +6,11 @@ function(input, output, session) {
   output$distPlot <- renderPlot({
     
     if(input$hist_country != "All"){
-      plot_data <- wellbeing |> 
+      plot_data <- wellbeing_dropped |> 
         filter(Reference_area == input$hist_country)
       title <- glue("Distribution of {input$hist_variable} for {input$hist_country}")
     } else if(input$hist_country == 'All'){
-      plot_data <- wellbeing
+      plot_data <- wellbeing_dropped
       title <- glue("Distribution of {input$hist_variable}")
     }
     
@@ -20,19 +20,6 @@ function(input, output, session) {
       labs(title = title)
     
     
-    
-    
-    
-    # # generate bins based on input$bins from ui.R
-    # x <- wellbeing$`Feeling lonely`
-    # # print(x)
-    # bins <- seq(min(x, na.rm = TRUE), max(x, na.rm = TRUE), length.out = input$bins + 1)
-    # # bins <- seq(0, 13.85, length.out = input$bins + 1)
-    # 
-    # # draw the histogram with the specified number of bins
-    # hist(x, breaks = bins, col = 'darkgray', border = 'white',
-    #      xlab = 'DF what what (in measure)',
-    #      main = 'DF What what')
     
   })
 
@@ -46,14 +33,14 @@ function(input, output, session) {
     
   output$scatPlot <- renderPlot({
     
-    plot_variables <- wellbeing
+    plot_variables <- wellbeing_dropped
     
-    if(input$country != "All"){
-      plot_variables <- wellbeing %>% 
-        filter(Reference_area == input$country)
-      title <- glue("{input$scatter_x} and {input$scatter_y} for {input$country}")
-    } else if(input$country == "All"){
-      plot_variables <- wellbeing
+    if(input$scatter_country != "All"){
+      plot_variables <- wellbeing_dropped %>% 
+        filter(Reference_area == input$scatter_country)
+      title <- glue("{input$scatter_x} and {input$scatter_y} for {input$scatter_country}")
+    } else if(input$scatter_country == "All"){
+      plot_variables <- wellbeing_dropped
       title <- glue("{input$scatter_x}")
     }
     ggplot(
@@ -61,6 +48,39 @@ function(input, output, session) {
       geom_point() +
       labs(title = title) +
       geom_smooth(method = lm, se = TRUE)
+    
+    
+  })
+  
+  
+  output$heatmapPlot <- renderPlot({
+    
+    plot_heat <- wellbeing_dropped
+    
+    if(input$heat_country != "All"){
+      plot_heat <- wellbeing_dropped %>% 
+        filter(Reference_area == input$heat_country)
+      title <- "Relationship between Variables selected."
+    } else if(input$heat_country == "All"){
+      plot_heat <- wellbeing_dropped
+      title <- "Relationship between Variables selected."
+    }
+    
+    the_values <- plot_heat[, input$checkboxes]
+    
+    print(the_values)
+    data <- cor(the_values)
+    data_melted <- melt(data)
+    print(data_melted)
+    ggplot(data_melted, aes(x = X1, y = X2, fill = value)) +
+      geom_tile() +
+      labs(title = "Heatmap demonstrating the relationship between chosen variables",
+           x = "variables selected",
+           y = "Variables selected") +
+      scale_fill_gradient2(low = "yellow", high = "red",
+                           limit = c(-1,1), name="Correlation") +
+      geom_text(aes(X2, X1, label = round(value, digits = 3)), size = 3) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
     
     
   })

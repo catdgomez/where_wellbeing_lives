@@ -27,7 +27,7 @@ library(tidyr)
 ### Perceived Health Status
 
 Reading in the first dataset, perceived health status.
- 
+
 ```{r}
 perceived_health_status <- read_csv("../data/perceived_health_status.csv")
 # dnmk <- read_csv("../data/denmark_only_phs.csv")
@@ -425,7 +425,7 @@ satisfaction_life_rels <- social_wellbeing %>%
   filter(Sex == "Total") %>% 
   filter(Age == "Total") %>% 
   filter(`Education level` == "Total")
-  
+
 satisfaction_life_rels[1:2, ]
 
 ```
@@ -446,7 +446,7 @@ lonely <- social_wellbeing %>%
   filter(Sex == "Total") %>% 
   filter(Age == "Total") %>% 
   filter(`Education level` == "Total")
-  
+
 lonely[1:2, ]
 
 ```
@@ -603,7 +603,7 @@ social_support_or_lack_v1 <- social_support_or_lack[order(social_support_or_lack
 lonely_v1 <- lonely[order(lonely$`Reference area`),]
 
 satisfaction_life_rels_v1 <- satisfaction_life_rels[order(satisfaction_life_rels$`Reference area`),]
- 
+
 
 
 phs_v1 # percentage of the population
@@ -690,7 +690,7 @@ phs_pivoted <- phs_v3 %>%
     names_from = c("HEALTH_STATUS"),
     names_prefix = "health_status_",
     values_from = "OBS_VALUE_PHS"
-    )
+  )
 
 phs_pivoted
 
@@ -704,7 +704,7 @@ el_pivoted <- el_v3 %>%
     id_cols = c("REF_AREA", "Reference_area", "TIME_PERIOD"), 
     names_from = c("Edu_attainment_lvl"),
     values_from = "OBS_VALUE_EL"
-    )
+  )
 
 
 el_pivoted
@@ -721,7 +721,7 @@ safety_pivoted <- safety_v3 %>%
     id_cols = c("REF_AREA", "Reference_area", "TIME_PERIOD"), 
     names_from = c("Measure_safety"),
     values_from = "OBS_VALUE_SAFETY"
-    )
+  )
 
 
 safety_pivoted
@@ -735,7 +735,7 @@ social_support_or_lack_pivoted <- social_support_or_lack_v3 %>%
     id_cols = c("REF_AREA", "Reference_area", "TIME_PERIOD"), 
     names_from = c("Measure_social"),
     values_from = "OBS_VALUE_SOCIAL"
-    )
+  )
 
 social_support_or_lack_pivoted
 
@@ -749,7 +749,7 @@ lonely_pivoted <- lonely_v3 %>%
     id_cols = c("REF_AREA", "Reference_area", "TIME_PERIOD"), 
     names_from = c("Measure_lonely"),
     values_from = "OBS_VALUE_LONELY"
-    )
+  )
 
 lonely_pivoted
 
@@ -763,7 +763,7 @@ satisfaction_life_rels_pivoted <- satisfaction_life_rels_v3 %>%
     id_cols = c("REF_AREA", "Reference_area", "TIME_PERIOD"), 
     names_from = c("Measure_sat"),
     values_from = "OBS_VALUE_SAT"
-    )
+  )
 
 satisfaction_life_rels_pivoted
 
@@ -917,7 +917,7 @@ rename columns in wellbeing data.
 
 ```{r}
 
-wellbeing_df_rnmd <- rename(wellbeing_df, replace = c(`Upper secondary or post-secondary non-tertiary education` = "upper_secondary_or_post_secondary_not_tertiary_education", `Tertiary education` = "tertiary_education", `Below upper secondary education` = "below_upper_secondary_education", `Motor vehicle theft` = "motor_vehicle_theft", `Mortality from transport accidents` = "mortality_from_transport_accidents", `Intentional homicides` = "intentional_homicides", `Social support` = "social_support", `Lack of social support` = "lack_of_social_support", `Feeling lonely` = "feeling_lonely", `Life satisfaction` = "life_satisfaction", `Satisfaction with personal relationships` = "satisfaction_with_personal_relationships"))
+wellbeing_df_rnmd <- rename(wellbeing_df, replace = c(`Upper secondary or post-secondary non-tertiary education` = "upper_secondary_education", `Tertiary education` = "tertiary_education", `Below upper secondary education` = "below_upper_secondary_education", `Motor vehicle theft` = "motor_vehicle_theft", `Mortality from transport accidents` = "mortality_from_transport_accidents", `Intentional homicides` = "intentional_homicides", `Social support` = "social_support", `Lack of social support` = "lack_of_social_support", `Feeling lonely` = "feeling_lonely", `Life satisfaction` = "life_satisfaction", `Satisfaction with personal relationships` = "satisfaction_w_relationships"))
 
 ```
 
@@ -941,20 +941,19 @@ Subset the dataframe to reflect only the columns I want to use for my heatmap. F
 
 ```{r}
 
-the_values <- wellbeing_df_dropped[, c("life_satisfaction", "feeling_lonely", "social_support", "intentional_homicides")]
-
+the_values <- wellbeing_df_dropped[, 5:17]#[, c("life_satisfaction", "feeling_lonely", "social_support", "intentional_homicides", "satisfaction_with_personal_relationships")] #colnames(wellbeing_df_dropped)[5:17]
+the_values 
 data <- cor(the_values)
 
-what_what <- melt(data)
+data_melted <- melt(data)
 
-ggplot(what_what, aes(x = Var1, y = Var2, fill = value)) +
+ggplot(data_melted, aes(x = Var1, y = Var2, fill = value)) +
   geom_tile() +
-  labs(title = "I'm confused",
-       x = "var1",
-       y = "var2") +
+  labs(title = "Heatmap Of relationship between four variables") +
   scale_fill_gradient2(low = "yellow", high = "red",
                        limit = c(-1,1), name="value") +
-    geom_text(aes(Var2, Var1, label = round(value, digits = 3)), size = 3)
+  geom_text(aes(Var2, Var1, label = round(value, digits = 2)), size = 3) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 ```
 
@@ -967,7 +966,7 @@ ggplot(what_what, aes(x = Var1, y = Var2, fill = value)) +
 ```{r}
 
 
-  
+
 ```
 
 
