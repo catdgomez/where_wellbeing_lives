@@ -21,7 +21,9 @@ library(gapminder)
 library(reshape2)
 library(reshape)
 library(tidyr)
-
+# for scatter plot with correlation to side
+# install.packages("ggpubr")
+library(ggpubr)
 
 ```
 ### Perceived Health Status
@@ -892,6 +894,9 @@ Histogram of wellbeing's "feeling lonely" column.
 ```{r}
 hist(wellbeing_df$`Feeling lonely`, xlab="feeling lonely")
 ```
+
+
+
 Inspect "Feeling lonely" column and the class of the dataframe. 
 
 ```{r}
@@ -960,19 +965,118 @@ ggplot(data_melted, aes(x = Var1, y = Var2, fill = value)) +
 
 ```{r}
 
+lm <- lm(life_satisfaction ~ feeling_lonely + social_support + intentional_homicides + tertiary_education, wellbeing_df_dropped)
+summary(lm)
+
+```
+
+```{r}
+# wellbeing_df_dropped
+    
+scatter_lonely_homicides <- ggplot(
+      wellbeing_df_dropped, aes(x = feeling_lonely, y = intentional_homicides)) + 
+      geom_point() +
+      geom_smooth(method = "lm", se = TRUE) +
+      labs(title = "Rel between variables")
+      
+
+
+```
+
+
+```{r}
+# # 
+# # cor(x, y, method = c("pearson", "kendall", "spearman"))
+# # cor.test(x, y, method=c("pearson", "kendall", "spearman"))
+res <- cor.test(wellbeing_df_dropped$intentional_homicides, wellbeing_df_dropped$feeling_lonely, 
+                     method = "pearson")
+# res
+# # Extract the p.value
+ res$p.value
+# Extract the correlation coefficient
+ res$estimate
 
 ```
 
 ```{r}
 
+Pvalue <- paste(strwrap("Unemployment rates in the US have 
+  varied a lot over the years", 40), collapse = "\n")
 
+ggscatter(wellbeing_df_dropped, x = "intentional_homicides", y = "feeling_lonely", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.ctes = TRUE, cor.method = "pearson") +
+          annotate(geom = "text", 
+                   x = wellbeing_df_dropped$intentional_homicides,
+                   y=wellbeing_df_dropped$feeling_lonely[1], 
+                   label= Pvalue) #+
+          # annotate("text", x=wellbeing_df_dropped$intentional_homicides, y=wellbeing_df_dropped$feeling_lonely[1], label= res$p.value) + 
+          # annotate("text", x=wellbeing_df_dropped$intentional_homicides, y=wellbeing_df_dropped$feeling_lonely[1], label= "Correlation Coefficient") +
+          # annotate("text", x = wellbeing_df_dropped$intentional_homicides, y=wellbeing_df_dropped$feeling_lonely[1], label = res$estimate)
+          # # #,
+          #xlab = "Loneliness vs Intentional Homicides", ylab = "Weight (1000 lbs)")
+```
 
+```{r}
+Pvalue <- paste(strwrap("P-value", 40), collapse = "\n")
+
+ggscatter(wellbeing_df_dropped, 
+          x = "intentional_homicides", 
+          y = "feeling_lonely") +
+  # geom_text() +
+  annotate(
+    "text", label = Pvalue,
+    x = -Inf, y = -Inf, hjust = 0, vjust = 0, size = 8, colour = "red"
+  )
 ```
 
 
 ```{r}
 
+phs_v3
+```
 
+```{r}
+
+phs_v3 |> 
+      ggplot(aes(x = OBS_VALUE_PHS)) +
+      geom_histogram(color = "white", fill = "salmon") + 
+      labs(title = "title")
+```
+```{r}
+write.csv(phs_v3, file = "../data/phs_grouped.csv")
+
+write.csv(el_v3, file = "../data/el_grouped.csv")
+
+write.csv(safety_v3, file = "../data/safety_grouped.csv")
+
+write.csv(social_support_or_lack_v3, file = "../data/social_grouped.csv")
+
+write.csv(satisfaction_life_rels_v3, file = "../data/sat_life_grouped.csv")
 
 ```
+
+```{r}
+phs_v3
+
+el_v3
+
+safety_v3
+
+social_support_or_lack_v3
+
+lonely_v3
+
+satisfaction_life_rels_v3
+```
+
+
+```{r}
+
+p<-ggplot(phs_v3, aes(x=OBS_VALUE_PHS))+
+  geom_histogram(color="white", fill="salmon")+
+  facet_grid(HEALTH_STATUS ~ .)
+p
+```
+
 

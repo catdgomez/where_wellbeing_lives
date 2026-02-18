@@ -6,14 +6,19 @@ library(leaflet)
 library(dplyr, warn.conflicts = FALSE)
 library(ggplot2)
 library(tidyr)
-# install.packages("heatmaply")
 library(heatmaply)
 library(plotly)
 library(reshape2)
 library(reshape)
-
+library(datasets)
+library(ggpubr)
 
 wellbeing <- read_csv("data/df.csv")
 wellbeing_dropped <- read_csv("data/wellbeing_df_dropped.csv")
+phs_grouped <- read_csv("data/phs_grouped.csv")
+el_grouped <- read_csv("data/el_grouped.csv")
+safety_grouped <- read_csv("data/safety_grouped.csv")
+social_grouped <- read_csv("data/social_grouped.csv")
+sat_life_grouped <- read_csv("data/sat_life_grouped.csv")
 
-
+phs_grouped %>%  view()

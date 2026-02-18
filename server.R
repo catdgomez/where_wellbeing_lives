@@ -3,6 +3,72 @@ function(input, output, session) {
   
   
   
+  output$scatPlot1 <- renderPlot({
+    
+    
+    res <- cor.test(wellbeing_dropped[input$scatter_x] %>% 
+                      pull(), 
+                    wellbeing_dropped[input$scatter_y] %>% 
+                      pull(), 
+                    method = "pearson")
+    
+    plot_variables <- wellbeing_dropped
+    
+    if(input$scatter_country != "All"){
+      plot_variables <- wellbeing_dropped %>% 
+        filter(Reference_area == input$scatter_country)
+      title <- glue("{input$scatter_x} and {input$scatter_y} for {input$scatter_country}")
+    } else if(input$scatter_country == "All"){
+      plot_variables <- wellbeing_dropped
+      title <- glue("{input$scatter_x}")
+    }
+    ggplot(
+      plot_variables, aes(x=.data[[input$scatter_x]], y = .data[[input$scatter_y]])) + 
+      geom_point() +
+      labs(title = title) +
+      geom_smooth(method = lm, se = TRUE) +
+      annotate(
+        "text", label = glue("Pvalue: {round(res$p.value, digits = 3)} and Correlation Coefficient: {round(res$estimate, digits = 3)}"),
+        x = -Inf, y = -Inf, hjust = 0, vjust = 0, size = 8, colour = "blue"
+      )
+    
+  })
+  
+  
+  
+  output$scatPlot2 <- renderPlot({
+    
+    
+    res <- cor.test(wellbeing_dropped[input$scatter_x2] %>% 
+                      pull(), 
+                    wellbeing_dropped[input$scatter_y2] %>% 
+                      pull(), 
+                    method = "pearson")
+    
+    plot_variables <- wellbeing_dropped
+    
+    if(input$scatter_country2 != "All"){
+      plot_variables <- wellbeing_dropped %>% 
+        filter(Reference_area == input$scatter_country2)
+      title <- glue("{input$scatter_x2} and {input$scatter_y2} for {input$scatter_country2}")
+    } else if(input$scatter_country2 == "All"){
+      plot_variables <- wellbeing_dropped
+      title <- glue("{input$scatter_x2}")
+    }
+    ggplot(
+      plot_variables, aes(x=.data[[input$scatter_x2]], y = .data[[input$scatter_y2]])) + 
+      geom_point() +
+      labs(title = title) +
+      geom_smooth(method = lm, se = TRUE) +
+      annotate(
+        "text", label = glue("Pvalue: {round(res$p.value, digits = 3)} and Correlation Coefficient: {round(res$estimate, digits = 3)}"),
+        x = -Inf, y = -Inf, hjust = 0, vjust = 0, size = 8, colour = "blue"
+      )
+    
+    
+    
+  })
+  
   output$distPlot <- renderPlot({
     
     if(input$hist_country != "All"){
@@ -22,35 +88,109 @@ function(input, output, session) {
     
     
   })
-
+  
   output$hist_bins <- renderUI({
     sliderInput("bins",
                 "Number of bins:",
                 min = 0,
                 max = 50,
-                value = 25)
+                value = 10)
   })
+  
+  
+  
+  output$distPlot2 <- renderPlot({
     
-  output$scatPlot <- renderPlot({
-    
-    plot_variables <- wellbeing_dropped
-    
-    if(input$scatter_country != "All"){
-      plot_variables <- wellbeing_dropped %>% 
-        filter(Reference_area == input$scatter_country)
-      title <- glue("{input$scatter_x} and {input$scatter_y} for {input$scatter_country}")
-    } else if(input$scatter_country == "All"){
-      plot_variables <- wellbeing_dropped
-      title <- glue("{input$scatter_x}")
+    # if(input$hist_country2 != "All"){
+    #   plot_data <- wellbeing_dropped |> 
+    #     filter(Reference_area == input$hist_country2)
+    #   title <- glue("Distribution of {input$hist_variable2} for {input$hist_country2}")
+    # } else if(input$hist_country2 == 'All'){
+    #   plot_data <- wellbeing_dropped
+    #   #title <- glue("Distribution of {input$hist_variable2}")
+    # }
+    # print(phs_grouped$OBS_VALUE_PHS)
+    if(input$hist_variable2 == "OBS_VALUE_PHS"){
+      
+      if(input$hist_country2 != "All"){
+        plot_data <- phs_grouped |> 
+          filter(Reference_area == input$hist_country2)
+        title <- glue("Distribution of {input$hist_variable2} for {input$hist_country2}")
+        
+        ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Health_status, color = Health_status)) +
+          geom_line()
+        
+      } else if(input$hist_country2 == 'All'){
+        plot_data <- phs_grouped
+        title <- glue("Distribution of {input$hist_variable2}")
+        
+        ggplot(plot_data, aes(x=.data[[input$hist_variable2]])) +
+          geom_histogram(color="white", fill="salmon", bins = input$bins2) +
+          facet_grid(Health_status ~ .)
+        
+      }
+      # plot_data <- phs_grouped 
+      #filter(Reference_area == input$hist_country2)
+      # title <- glue("Distribution of {input$hist_variable2}")
+      
+      
+      
+    } else if(input$hist_variable2 == "OBS_VALUE_EL"){
+      
+      plot_data <- el_grouped |> 
+        filter(Reference_area == input$hist_country2)
+      # title <- glue("Distribution of {input$hist_variable2}")
+      
+      ggplot(plot_data, aes(x=input$hist_variable2)) +
+        geom_histogram(color="white", fill="salmon", bins = input$bins2) +
+        facet_grid(Edu_attainment_lvl ~ .)
+      
+    } else if(input$hist_variable2 == "OBS_VALUE_SAFETY"){
+      
+      plot_data <- safety_grouped |> 
+        filter(Reference_area == input$hist_country2)
+      # title <- glue("Distribution of {input$hist_variable2}")
+      
+      ggplot(plot_data, aes(x=input$hist_variable2)) +
+        geom_histogram(color="white", fill="salmon", bins = input$bins2) +
+        facet_grid(Measure_safety ~ .)
+      
+    } else if(input$hist_variable2 == "OBS_VALUE_SOCIAL"){
+      
+      
+      plot_data <- social_grouped |> 
+        filter(Reference_area == input$hist_country2)
+      # title <- glue("Distribution of {input$hist_variable2}")
+      
+      ggplot(plot_data, aes(x=input$hist_variable2)) +
+        geom_histogram(color="white", fill="salmon", bins = input$bins2) +
+        facet_grid(Measure_social ~ .)
+      
+    } else if(input$hist_variable2 == "OBS_VALUE_SAT"){
+      
+      
+      plot_data <- sat_life_grouped |> 
+        filter(Reference_area == input$hist_country2)
+      # title <- glue("Distribution of {input$hist_variable2}")
+      
+      ggplot(plot_data, aes(x=input$hist_variable2)) +
+        geom_histogram(color="white", fill="salmon", bins = input$bins2) +
+        facet_grid(Measure_sat ~ .)
+      
     }
-    ggplot(
-      plot_variables, aes(x=.data[[input$scatter_x]], y = .data[[input$scatter_y]])) + 
-      geom_point() +
-      labs(title = title) +
-      geom_smooth(method = lm, se = TRUE)
-    
     
   })
+  
+  
+  
+  output$hist_bins2 <- renderUI({
+    sliderInput("bins2",
+                "Number of bins for grouped Histogram:",
+                min = 0,
+                max = 50,
+                value = 10)
+  })
+  
   
   
   output$heatmapPlot <- renderPlot({
@@ -75,13 +215,27 @@ function(input, output, session) {
     ggplot(data_melted, aes(x = X1, y = X2, fill = value)) +
       geom_tile() +
       labs(title = "Heatmap demonstrating the relationship between chosen variables",
-           x = "variables selected",
+           x = "variables selected", 
            y = "Variables selected") +
-      scale_fill_gradient2(low = "yellow", high = "red",
+      scale_fill_gradient2(low = "red", high = "blue",
                            limit = c(-1,1), name="Correlation") +
       geom_text(aes(X2, X1, label = round(value, digits = 3)), size = 3) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
     
+    
+  })
+  
+  output$tableTable <- renderDataTable({
+    
+    if(input$table_country != "All"){
+      selected_data <- wellbeing_dropped |> 
+        filter(Reference_area == input$table_country) %>% 
+        select(-"...1")
+    } else if(input$table_country == 'All'){
+      selected_data <- wellbeing_dropped
+    }
+    
+    selected_data
     
   })
   
