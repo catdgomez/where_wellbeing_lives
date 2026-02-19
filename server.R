@@ -1,10 +1,6 @@
-# Define server logic required to draw a histogram
 function(input, output, session) {
   
-  
-  
   output$scatPlot1 <- renderPlot({
-    
     
     res <- cor.test(wellbeing_dropped[input$scatter_x] %>% 
                       pull(), 
@@ -33,11 +29,9 @@ function(input, output, session) {
       )
     
   })
-  
-  
+
   
   output$scatPlot2 <- renderPlot({
-    
     
     res <- cor.test(wellbeing_dropped[input$scatter_x2] %>% 
                       pull(), 
@@ -65,10 +59,9 @@ function(input, output, session) {
         x = -Inf, y = -Inf, hjust = 0, vjust = 0, size = 8, colour = "blue"
       )
     
-    
-    
   })
-  
+
+    
   output$distPlot <- renderPlot({
     
     if(input$hist_country != "All"){
@@ -84,10 +77,9 @@ function(input, output, session) {
       ggplot(aes(x = .data[[input$hist_variable]])) +
       geom_histogram(color = "white", fill = "salmon", bins = input$bins) + 
       labs(title = title)
-    
-    
-    
+  
   })
+  
   
   output$hist_bins <- renderUI({
     sliderInput("bins",
@@ -98,23 +90,14 @@ function(input, output, session) {
   })
   
   
-  
   output$distPlot2 <- renderPlot({
     
-    # if(input$hist_country2 != "All"){
-    #   plot_data <- wellbeing_dropped |> 
-    #     filter(Reference_area == input$hist_country2)
-    #   title <- glue("Distribution of {input$hist_variable2} for {input$hist_country2}")
-    # } else if(input$hist_country2 == 'All'){
-    #   plot_data <- wellbeing_dropped
-    #   #title <- glue("Distribution of {input$hist_variable2}")
-    # }
-    # print(phs_grouped$OBS_VALUE_PHS)
     if(input$hist_variable2 == "OBS_VALUE_PHS"){
       
       if(input$hist_country2 != "All"){
         plot_data <- phs_grouped |> 
           filter(Reference_area == input$hist_country2)
+        # title <- glue("Distribution of {.data[[input$hist_variable2]]} for {.data[[input$hist_country2]]}")
         title <- glue("Distribution of {input$hist_variable2} for {input$hist_country2}")
         
         ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Health_status, color = Health_status)) +
@@ -127,60 +110,91 @@ function(input, output, session) {
         ggplot(plot_data, aes(x=.data[[input$hist_variable2]])) +
           geom_histogram(color="white", fill="salmon", bins = input$bins2) +
           facet_grid(Health_status ~ .)
-        
       }
-      # plot_data <- phs_grouped 
-      #filter(Reference_area == input$hist_country2)
-      # title <- glue("Distribution of {input$hist_variable2}")
-      
-      
+  
       
     } else if(input$hist_variable2 == "OBS_VALUE_EL"){
       
-      plot_data <- el_grouped |> 
-        filter(Reference_area == input$hist_country2)
-      # title <- glue("Distribution of {input$hist_variable2}")
+      if(input$hist_country2 != "All"){
+        plot_data <- el_grouped |> 
+          filter(Reference_area == input$hist_country2)
+        title <- glue("Distribution of {input$hist_variable2} for {input$hist_country2}")
+        
+        ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Edu_attainment_lvl, color = Edu_attainment_lvl)) +
+          geom_line()
+        
+      } else if(input$hist_country2 == 'All'){
+        plot_data <- el_grouped
+        title <- glue("Distribution of {input$hist_variable2}")
+        
+        ggplot(plot_data, aes(x=.data[[input$hist_variable2]])) +
+          geom_histogram(color="white", fill="salmon", bins = input$bins2) +
+          facet_grid(Edu_attainment_lvl ~ .)
+      }
       
-      ggplot(plot_data, aes(x=input$hist_variable2)) +
-        geom_histogram(color="white", fill="salmon", bins = input$bins2) +
-        facet_grid(Edu_attainment_lvl ~ .)
       
     } else if(input$hist_variable2 == "OBS_VALUE_SAFETY"){
       
-      plot_data <- safety_grouped |> 
-        filter(Reference_area == input$hist_country2)
-      # title <- glue("Distribution of {input$hist_variable2}")
+      if(input$hist_country2 != "All"){
+        plot_data <- safety_grouped |> 
+          filter(Reference_area == input$hist_country2)
+        title <- glue("Distribution of {input$hist_variable2} for {input$hist_country2}")
+        
+        ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Measure_safety, color = Measure_safety)) +
+          geom_line()
+        
+      } else if(input$hist_country2 == 'All'){
+        plot_data <- safety_grouped
+        title <- glue("Distribution of {input$hist_variable2}")
+        
+        ggplot(plot_data, aes(x=.data[[input$hist_variable2]])) +
+          geom_histogram(color="white", fill="salmon", bins = input$bins2) +
+          facet_grid(Measure_safety ~ .)
+      }
       
-      ggplot(plot_data, aes(x=input$hist_variable2)) +
-        geom_histogram(color="white", fill="salmon", bins = input$bins2) +
-        facet_grid(Measure_safety ~ .)
       
     } else if(input$hist_variable2 == "OBS_VALUE_SOCIAL"){
       
+      if(input$hist_country2 != "All"){
+        plot_data <- social_grouped |> 
+          filter(Reference_area == input$hist_country2)
+        title <- glue("Distribution of {input$hist_variable2} for {input$hist_country2}")
+        
+        ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Measure_social, color = Measure_social)) +
+          geom_line()
+        
+      } else if(input$hist_country2 == 'All'){
+        plot_data <- social_grouped
+        title <- glue("Distribution of {input$hist_variable2}")
+        
+        ggplot(plot_data, aes(x=.data[[input$hist_variable2]])) +
+          geom_histogram(color="white", fill="salmon", bins = input$bins2) +
+          facet_grid(Measure_social ~ .)
+      }
       
-      plot_data <- social_grouped |> 
-        filter(Reference_area == input$hist_country2)
-      # title <- glue("Distribution of {input$hist_variable2}")
-      
-      ggplot(plot_data, aes(x=input$hist_variable2)) +
-        geom_histogram(color="white", fill="salmon", bins = input$bins2) +
-        facet_grid(Measure_social ~ .)
       
     } else if(input$hist_variable2 == "OBS_VALUE_SAT"){
       
-      
-      plot_data <- sat_life_grouped |> 
-        filter(Reference_area == input$hist_country2)
-      # title <- glue("Distribution of {input$hist_variable2}")
-      
-      ggplot(plot_data, aes(x=input$hist_variable2)) +
-        geom_histogram(color="white", fill="salmon", bins = input$bins2) +
-        facet_grid(Measure_sat ~ .)
+      if(input$hist_country2 != "All"){
+        plot_data <- sat_life_grouped |> 
+          filter(Reference_area == input$hist_country2)
+        title <- glue("Distribution of {input$hist_variable2} for {input$hist_country2}")
+        
+        ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Measure_sat, color = Measure_sat)) +
+          geom_line()
+        
+      } else if(input$hist_country2 == 'All'){
+        plot_data <- sat_life_grouped
+        title <- glue("Distribution of {input$hist_variable2}")
+        
+        ggplot(plot_data, aes(x=.data[[input$hist_variable2]])) +
+          geom_histogram(color="white", fill="salmon", bins = input$bins2) +
+          facet_grid(Measure_sat ~ .)
+      }  
       
     }
     
   })
-  
   
   
   output$hist_bins2 <- renderUI({
@@ -190,7 +204,6 @@ function(input, output, session) {
                 max = 50,
                 value = 10)
   })
-  
   
   
   output$heatmapPlot <- renderPlot({
@@ -222,9 +235,9 @@ function(input, output, session) {
       geom_text(aes(X2, X1, label = round(value, digits = 3)), size = 3) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
     
-    
   })
-  
+
+    
   output$tableTable <- renderDataTable({
     
     if(input$table_country != "All"){
@@ -232,12 +245,14 @@ function(input, output, session) {
         filter(Reference_area == input$table_country) %>% 
         select(-"...1")
     } else if(input$table_country == 'All'){
-      selected_data <- wellbeing_dropped
+      selected_data <- wellbeing_dropped %>% 
+        select(-"...1")
     }
     
     selected_data
     
   })
+  
   
 }
 

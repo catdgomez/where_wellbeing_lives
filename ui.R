@@ -131,7 +131,7 @@ fluidPage(
             hr(),
             hr(),
             hr(),
-            
+            br(),
             uiOutput(
               "hist_bins2"
             ),
