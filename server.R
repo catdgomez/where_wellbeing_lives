@@ -1,5 +1,11 @@
 function(input, output, session) {
   
+  
+  observe(session$setCurrentTheme(
+    if (isTRUE(input$dark_mode)) dark else light
+  ))
+  
+  
   output$scatPlot1 <- renderPlot({
     
     res <- cor.test(wellbeing_dropped[input$scatter_x] %>% 
@@ -98,10 +104,11 @@ function(input, output, session) {
         plot_data <- phs_grouped |> 
           filter(Reference_area == input$hist_country2)
         # title <- glue("Distribution of {.data[[input$hist_variable2]]} for {.data[[input$hist_country2]]}")
-        title <- glue("Distribution of {input$hist_variable2} for {input$hist_country2}")
+        title <- glue("Percentage of the population who self-identified as having the respective levels of health for {input$hist_country2}")
         
         ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Health_status, color = Health_status)) +
-          geom_line()
+          geom_line() +
+          labs(title = title)
         
       } else if(input$hist_country2 == 'All'){
         plot_data <- phs_grouped
@@ -109,7 +116,8 @@ function(input, output, session) {
         
         ggplot(plot_data, aes(x=.data[[input$hist_variable2]])) +
           geom_histogram(color="white", fill="salmon", bins = input$bins2) +
-          facet_grid(Health_status ~ .)
+          facet_grid(Health_status ~ .) +
+          labs(title = title)
       }
   
       
@@ -221,7 +229,6 @@ function(input, output, session) {
     
     the_values <- plot_heat[, input$checkboxes]
     
-    print(the_values)
     data <- cor(the_values)
     data_melted <- melt(data)
     print(data_melted)
@@ -252,6 +259,42 @@ function(input, output, session) {
     selected_data
     
   })
+  
+  
+  output$confintPlot <- renderPlot({
+    
+    est <- map_dbl(
+      
+      list(wellbeing_dropped$feeling_lonely, wellbeing_dropped$social_support, wellbeing_dropped$intentional_homicides, wellbeing_dropped$health_status_F, wellbeing_dropped$health_status_B, wellbeing_dropped$health_status_G, wellbeing_dropped$upper_secondary_education, wellbeing_dropped$tertiary_education, wellbeing_dropped$below_upper_secondary_education, wellbeing_dropped$motor_vehicle_theft, wellbeing_dropped$mortality_from_transport_accidents, wellbeing_dropped$lack_of_social_support, wellbeing_dropped$satisfaction_w_relationships),
+      \(x) round(cor.test(wellbeing_dropped$life_satisfaction, x, method = "pearson")$estimate, 4)
+      
+    )
+
+    lower <- map_dbl(
+      
+      list(wellbeing_dropped$feeling_lonely, wellbeing_dropped$social_support, wellbeing_dropped$intentional_homicides, wellbeing_dropped$health_status_F, wellbeing_dropped$health_status_B, wellbeing_dropped$health_status_G, wellbeing_dropped$upper_secondary_education, wellbeing_dropped$tertiary_education, wellbeing_dropped$below_upper_secondary_education, wellbeing_dropped$motor_vehicle_theft, wellbeing_dropped$mortality_from_transport_accidents, wellbeing_dropped$lack_of_social_support, wellbeing_dropped$satisfaction_w_relationships),
+      \(x) round(cor.test(wellbeing_dropped$life_satisfaction, x, method = "pearson")$conf.int[1], 4)
+      
+    )
+        
+    upper <- map_dbl(
+      
+      list(wellbeing_dropped$feeling_lonely, wellbeing_dropped$social_support, wellbeing_dropped$intentional_homicides, wellbeing_dropped$health_status_F, wellbeing_dropped$health_status_B, wellbeing_dropped$health_status_G, wellbeing_dropped$upper_secondary_education, wellbeing_dropped$tertiary_education, wellbeing_dropped$below_upper_secondary_education, wellbeing_dropped$motor_vehicle_theft, wellbeing_dropped$mortality_from_transport_accidents, wellbeing_dropped$lack_of_social_support, wellbeing_dropped$satisfaction_w_relationships),
+      
+      \(x) round(cor.test(wellbeing_dropped$life_satisfaction, x, method = "pearson")$conf.int[2], 4)
+      
+    )    
+    
+    tibble(est, lower, upper, variable = c("feeling_lonely", "social_support", "intentional_homicides", "health_status_F", "health_status_B", "health_status_G", "upper_secondary_education", "tertiary_education", "below_upper_secondary_education", "motor_vehicle_theft", "mortality_from_transport_accidents", "lack_of_social_support","satisfaction_w_relationships")) %>%
+      ggplot(aes(variable, est)) +
+      geom_point() +
+      geom_errorbar(aes(ymin=lower, ymax=upper)) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    
+    
+    
+  })
+  
   
   
 }

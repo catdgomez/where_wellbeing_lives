@@ -24,6 +24,9 @@ library(tidyr)
 # for scatter plot with correlation to side
 # install.packages("ggpubr")
 library(ggpubr)
+# for correlation
+# install.packages("corrr")
+library(corrr)
 
 ```
 ### Perceived Health Status
@@ -965,10 +968,74 @@ ggplot(data_melted, aes(x = Var1, y = Var2, fill = value)) +
 
 ```{r}
 
-lm <- lm(life_satisfaction ~ feeling_lonely + social_support + intentional_homicides + tertiary_education, wellbeing_df_dropped)
-summary(lm)
+wellbeing_lm <- lm(life_satisfaction ~ feeling_lonely + social_support + intentional_homicides + tertiary_education + health_status_F, wellbeing_df_dropped)
+# summary(wellbeing_lm)
+
+# confint(wellbeing_lm)
 
 ```
+
+```{r}
+
+
+
+```
+
+
+```{r}
+
+new_data <- data.frame(wellbeing_df_dropped$life_satisfaction)
+
+
+mean.pred.intervals <- function(x, y, pred.x) {
+  n <- length(y) # Find sample size
+  lm.model <- lm(y ~ x) # Fit linear model
+  y.fitted <- lm.model$fitted.values # Extract the fitted values of y
+  
+  # Coefficients of the linear model, beta0 and beta1
+  b0 <- lm.model$coefficients[1]
+  b1 <- lm.model$coefficients[2]
+  
+  pred.y <- b1 * pred.x + b0 # Predict y at the given value of x (argument pred.x)
+  
+  # Find SSE and MSE
+  sse <- sum((y - y.fitted)^2)
+  mse <- sse / (n - 2)
+  
+  t.val <- qt(0.975, n - 2) # Critical value of t
+  
+  mean.se.fit <- (1 / n + (pred.x - mean(x))^2 / (sum((x - mean(x))^2))) # Standard error of the mean estimate
+  pred.se.fit <- (1 + (1 / n) + (pred.x - mean(x))^2 / (sum((x - mean(x))^2))) # Standard error of the prediction
+  
+  # Mean Estimate Upper and Lower Confidence limits at 95% Confidence
+  mean.conf.upper <- pred.y + t.val * sqrt(mse * mean.se.fit)
+  mean.conf.lower <- pred.y - t.val * sqrt(mse * mean.se.fit)
+  
+  # Prediction Upper and Lower Confidence limits at 95% Confidence
+  pred.conf.upper <- pred.y + t.val * sqrt(mse * pred.se.fit)
+  pred.conf.lower <- pred.y - t.val * sqrt(mse * pred.se.fit)
+  
+  # Beta 1 Upper and Lower Confidence limits at 95% Confidence
+  b1.conf.upper <- b1 + t.val * sqrt(mse) / sqrt(sum((x - mean(x))^2))
+  b1.conf.lower <- b1 - t.val * sqrt(mse) / sqrt(sum((x - mean(x))^2))
+  
+  # Build data.frame of upper and lower limits calculated above, as well as the predicted y and beta 1 values
+  upper <- data.frame(rbind(round(mean.conf.upper, 2), round(pred.conf.upper, 2), round(b1.conf.upper, 2)))
+  lower <- data.frame(rbind(round(mean.conf.lower, 2), round(pred.conf.lower, 2), round(b1.conf.lower, 2)))
+  fit <- data.frame(rbind(round(pred.y, 2), round(pred.y, 2), round(b1, 2)))
+  
+  # Collect all into data.frame and rename columns
+  results <- data.frame(cbind(lower, upper, fit), row.names = c('Mean', 'Prediction', 'Coefficient'))
+  colnames(results) <- c('Lower', 'Upper', 'Fit')
+  
+  return(results)
+}
+
+mean.pred.intervals(wellbeing_df_dropped$life_satisfaction, wellbeing_df_dropped$health_status_F, new_data)
+
+```
+
+
 
 ```{r}
 # wellbeing_df_dropped
@@ -1078,5 +1145,112 @@ p<-ggplot(phs_v3, aes(x=OBS_VALUE_PHS))+
   facet_grid(HEALTH_STATUS ~ .)
 p
 ```
+
+
+```{r}
+
+wellbeing_df_dropped %>% 
+  correlate() %>% 
+  focus(life_satisfaction)
+
+```
+```{r}
+
+result <- t.test(wellbeing_df_dropped$life_satisfaction)
+
+confidence_interval <- result$conf.int
+
+confidence_interval
+
+
+```
+
+```{r}
+
+result <- t.test(wellbeing_df_dropped$life_satisfaction)
+
+confidence_interval <- result$conf.int
+
+confidence_interval
+```
+
+
+```{r}
+
+hmm <- cor.test(wellbeing_df_dropped[4:17] %>% 
+                      pull(), 
+                    wellbeing_df_dropped[4:17] %>% 
+                      pull(), 
+                    method = "pearson")
+
+wellbeing_df_dropped %>% view()
+
+hmm
+```
+```{r}
+
+ct <- cor.test(
+  wellbeing_df_dropped$life_satisfaction, 
+  wellbeing_df_dropped$intentional_homicides,
+  method = "pearson"
+  )
+# ct
+ct
+round(ct$conf.int[1], 3)
+round(ct$conf.int[2], 3)
+
+
+# wellbeing_df_dropped %>% view()
+```
+
+```{r}
+est <- map_dbl(
+  
+  list(wellbeing_df_dropped$feeling_lonely, wellbeing_df_dropped$social_support, wellbeing_df_dropped$intentional_homicides, wellbeing_df_dropped$health_status_F, wellbeing_df_dropped$health_status_B, wellbeing_df_dropped$health_status_G, wellbeing_df_dropped$upper_secondary_education, wellbeing_df_dropped$tertiary_education, wellbeing_df_dropped$below_upper_secondary_education, wellbeing_df_dropped$motor_vehicle_theft, wellbeing_df_dropped$mortality_from_transport_accidents, wellbeing_df_dropped$lack_of_social_support, wellbeing_df_dropped$satisfaction_w_relationships),
+  
+  \(x) round(cor.test(wellbeing_df_dropped$life_satisfaction, x, method = "pearson")$estimate, 4)
+  
+  )
+
+
+ 
+lower <- map_dbl(
+  
+  list(wellbeing_df_dropped$feeling_lonely, wellbeing_df_dropped$social_support, wellbeing_df_dropped$intentional_homicides, wellbeing_df_dropped$health_status_F, wellbeing_df_dropped$health_status_B, wellbeing_df_dropped$health_status_G, wellbeing_df_dropped$upper_secondary_education, wellbeing_df_dropped$tertiary_education, wellbeing_df_dropped$below_upper_secondary_education, wellbeing_df_dropped$motor_vehicle_theft, wellbeing_df_dropped$mortality_from_transport_accidents, wellbeing_df_dropped$lack_of_social_support, wellbeing_df_dropped$satisfaction_w_relationships),
+  
+  \(x) round(cor.test(wellbeing_df_dropped$life_satisfaction, x, method = "pearson")$conf.int[1], 4)
+  
+  )
+
+
+upper <- map_dbl(
+  
+  list(wellbeing_df_dropped$feeling_lonely, wellbeing_df_dropped$social_support, wellbeing_df_dropped$intentional_homicides, wellbeing_df_dropped$health_status_F, wellbeing_df_dropped$health_status_B, wellbeing_df_dropped$health_status_G, wellbeing_df_dropped$upper_secondary_education, wellbeing_df_dropped$tertiary_education, wellbeing_df_dropped$below_upper_secondary_education, wellbeing_df_dropped$motor_vehicle_theft, aQ1wellbeing_df_dropped$mortality_from_transport_accidents, wellbeing_df_dropped$lack_of_social_support, wellbeing_df_dropped$satisfaction_w_relationships),
+  
+  \(x) round(cor.test(wellbeing_df_dropped$life_satisfaction, x, method = "pearson")$conf.int[2], 4)
+  
+  )
+
+
+est
+lower
+upper
+
+tibble(est, lower, upper, variable = c("feeling_lonely", "social_support", "intentional_homicides", "health_status_F", "health_status_B", "health_status_G", "upper_secondary_education", "tertiary_education", "below_upper_secondary_education", "motor_vehicle_theft", "mortality_from_transport_accidents", "lack_of_social_support","satisfaction_w_relationships")) %>%
+   ggplot(aes(variable, est)) +
+   geom_point() +
+   geom_errorbar(aes(ymin=lower, ymax=upper)) +
+   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+```
+
+```{r}
+
+
+
+```
+
 
 
