@@ -1,18 +1,10 @@
 function(input, output, session) {
   
-  
-  observe(session$setCurrentTheme(
-    if (isTRUE(input$dark_mode)) dark else light
-  ))
-  
+ 
   
   output$scatPlot1 <- renderPlot({
     
-    res <- cor.test(wellbeing_dropped[input$scatter_x] %>% 
-                      pull(), 
-                    wellbeing_dropped[input$scatter_y] %>% 
-                      pull(), 
-                    method = "pearson")
+    
     
     plot_variables <- wellbeing_dropped
     
@@ -24,6 +16,13 @@ function(input, output, session) {
       plot_variables <- wellbeing_dropped
       title <- glue("{input$scatter_x}")
     }
+    
+    res <- cor.test(plot_variables[input$scatter_x] %>% 
+                      pull(), 
+                    plot_variables[input$scatter_y] %>% 
+                      pull(), 
+                    method = "pearson")
+    
     ggplot(
       plot_variables, aes(x=.data[[input$scatter_x]], y = .data[[input$scatter_y]])) + 
       geom_point() +
@@ -39,11 +38,7 @@ function(input, output, session) {
   
   output$scatPlot2 <- renderPlot({
     
-    res <- cor.test(wellbeing_dropped[input$scatter_x2] %>% 
-                      pull(), 
-                    wellbeing_dropped[input$scatter_y2] %>% 
-                      pull(), 
-                    method = "pearson")
+
     
     plot_variables <- wellbeing_dropped
     
@@ -55,6 +50,13 @@ function(input, output, session) {
       plot_variables <- wellbeing_dropped
       title <- glue("{input$scatter_x2}")
     }
+    
+    res <- cor.test(plot_variables[input$scatter_x2] %>% 
+                      pull(), 
+                    plot_variables[input$scatter_y2] %>% 
+                      pull(), 
+                    method = "pearson") 
+    
     ggplot(
       plot_variables, aes(x=.data[[input$scatter_x2]], y = .data[[input$scatter_y2]])) + 
       geom_point() +
@@ -68,25 +70,6 @@ function(input, output, session) {
   })
 
     
-  output$distPlot <- renderPlot({
-    
-    if(input$hist_country != "All"){
-      plot_data <- wellbeing_dropped |> 
-        filter(Reference_area == input$hist_country)
-      title <- glue("Distribution of {input$hist_variable} for {input$hist_country}")
-    } else if(input$hist_country == 'All'){
-      plot_data <- wellbeing_dropped
-      title <- glue("Distribution of {input$hist_variable}")
-    }
-    
-    plot_data |> 
-      ggplot(aes(x = .data[[input$hist_variable]])) +
-      geom_histogram(color = "white", fill = "salmon", bins = input$bins) + 
-      labs(title = title)
-  
-  })
-  
-  
   output$hist_bins <- renderUI({
     sliderInput("bins",
                 "Number of bins:",
@@ -103,21 +86,20 @@ function(input, output, session) {
       if(input$hist_country2 != "All"){
         plot_data <- phs_grouped |> 
           filter(Reference_area == input$hist_country2)
-        # title <- glue("Distribution of {.data[[input$hist_variable2]]} for {.data[[input$hist_country2]]}")
-        title <- glue("Percentage of the population who self-identified as having the respective levels of health for {input$hist_country2}")
-        
+        title <- glue("% of the pop who self-identified as having the respective levels of health for {input$hist_country2}")
+         q
         ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Health_status, color = Health_status)) +
           geom_line() +
-          labs(title = title)
+          labs(y="% of the pop with respective levels of health", title = title)
         
       } else if(input$hist_country2 == 'All'){
         plot_data <- phs_grouped
-        title <- glue("Distribution of {input$hist_variable2}")
+        title <- glue("Distribution of Perceived Health Status")
         
         ggplot(plot_data, aes(x=.data[[input$hist_variable2]])) +
           geom_histogram(color="white", fill="salmon", bins = input$bins2) +
           facet_grid(Health_status ~ .) +
-          labs(title = title)
+          labs(x="Observed Values for Perceived Health Status", title = title)
       }
   
       
@@ -126,18 +108,20 @@ function(input, output, session) {
       if(input$hist_country2 != "All"){
         plot_data <- el_grouped |> 
           filter(Reference_area == input$hist_country2)
-        title <- glue("Distribution of {input$hist_variable2} for {input$hist_country2}")
+        title <- glue("% of the pop that has attained that level of education for {input$hist_country2}")
         
         ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Edu_attainment_lvl, color = Edu_attainment_lvl)) +
-          geom_line()
+          geom_line() +
+          labs(y="% of the pop with respective levels of education", title = title)
         
       } else if(input$hist_country2 == 'All'){
         plot_data <- el_grouped
-        title <- glue("Distribution of {input$hist_variable2}")
+        title <- glue("Distribution of Educational Attainment Level")
         
         ggplot(plot_data, aes(x=.data[[input$hist_variable2]])) +
           geom_histogram(color="white", fill="salmon", bins = input$bins2) +
-          facet_grid(Edu_attainment_lvl ~ .)
+          facet_grid(Edu_attainment_lvl ~ .) +
+          labs(x="Observed Values for Educational Attainment Level", title = title)
       }
       
       
@@ -146,18 +130,20 @@ function(input, output, session) {
       if(input$hist_country2 != "All"){
         plot_data <- safety_grouped |> 
           filter(Reference_area == input$hist_country2)
-        title <- glue("Distribution of {input$hist_variable2} for {input$hist_country2}")
+        title <- glue("Number of incidents per 100,000 people for {input$hist_country2}")
         
         ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Measure_safety, color = Measure_safety)) +
-          geom_line()
+          geom_line() +
+          labs(y="incidents per 100,000 people", title = title)
         
       } else if(input$hist_country2 == 'All'){
         plot_data <- safety_grouped
-        title <- glue("Distribution of {input$hist_variable2}")
+        title <- glue("Distribution of Crime/Safety Incidents per 100,000 People")
         
         ggplot(plot_data, aes(x=.data[[input$hist_variable2]])) +
           geom_histogram(color="white", fill="salmon", bins = input$bins2) +
-          facet_grid(Measure_safety ~ .)
+          facet_grid(Measure_safety ~ .) +
+          labs(x="Observed Values for Crime or Safety Measures", title = title)
       }
       
       
@@ -166,18 +152,20 @@ function(input, output, session) {
       if(input$hist_country2 != "All"){
         plot_data <- social_grouped |> 
           filter(Reference_area == input$hist_country2)
-        title <- glue("Distribution of {input$hist_variable2} for {input$hist_country2}")
+        title <- glue("% of the pop that self-identified as either having or lacking social support for {input$hist_country2}")
         
         ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Measure_social, color = Measure_social)) +
-          geom_line()
+          geom_line() +
+          labs(y="% of the population", title = title)
         
       } else if(input$hist_country2 == 'All'){
         plot_data <- social_grouped
-        title <- glue("Distribution of {input$hist_variable2}")
+        title <- glue("Distribution of Social Support or Lack of Social Support")
         
         ggplot(plot_data, aes(x=.data[[input$hist_variable2]])) +
           geom_histogram(color="white", fill="salmon", bins = input$bins2) +
-          facet_grid(Measure_social ~ .)
+          facet_grid(Measure_social ~ .) +
+          labs(x="Observed Values for Social Connection", title = title)
       }
       
       
@@ -186,18 +174,20 @@ function(input, output, session) {
       if(input$hist_country2 != "All"){
         plot_data <- sat_life_grouped |> 
           filter(Reference_area == input$hist_country2)
-        title <- glue("Distribution of {input$hist_variable2} for {input$hist_country2}")
+        title <- glue("% of the pop that identifies as either having or lacking of satisfaction with life for {input$hist_country2}")
         
         ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Measure_sat, color = Measure_sat)) +
-          geom_line()
+          geom_line() +
+          labs(y="% of the population", title = title)
         
       } else if(input$hist_country2 == 'All'){
         plot_data <- sat_life_grouped
-        title <- glue("Distribution of {input$hist_variable2}")
+        title <- glue("Distribution of Satisfaction with life or lack of satisfaction with life")
         
         ggplot(plot_data, aes(x=.data[[input$hist_variable2]])) +
           geom_histogram(color="white", fill="salmon", bins = input$bins2) +
-          facet_grid(Measure_sat ~ .)
+          facet_grid(Measure_sat ~ .) +
+          labs(x="Observed Values for Satisfaction with Life and Relationships", title = title)
       }  
       
     }
@@ -286,10 +276,10 @@ function(input, output, session) {
     )    
     
     tibble(est, lower, upper, variable = c("feeling_lonely", "social_support", "intentional_homicides", "health_status_F", "health_status_B", "health_status_G", "upper_secondary_education", "tertiary_education", "below_upper_secondary_education", "motor_vehicle_theft", "mortality_from_transport_accidents", "lack_of_social_support","satisfaction_w_relationships")) %>%
-      ggplot(aes(variable, est)) +
+      ggplot(aes(fct_relevel(variable, c("social_support", "lack_of_social_support", "health_status_G", "health_status_F", "health_status_B", "below_upper_secondary_education", "upper_secondary_education", "tertiary_education", "intentional_homicides", "motor_vehicle_theft", "mortality_from_transport_accidents", "satisfaction_w_relationships", "feeling_lonely")), est)) +
       geom_point() +
       geom_errorbar(aes(ymin=lower, ymax=upper)) +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      theme(axis.text.x = element_text(angle = 90, hjust = 1))
     
     
     

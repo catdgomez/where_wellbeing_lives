@@ -13,6 +13,8 @@ library(reshape)
 library(datasets)
 library(ggpubr)
 library(bslib)
+# install.packages("rsconnect")
+
 
 wellbeing <- read_csv("data/df.csv")
 wellbeing_dropped <- read_csv("data/wellbeing_df_dropped.csv")
