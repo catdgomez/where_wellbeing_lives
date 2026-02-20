@@ -154,6 +154,8 @@ function(input, output, session) {
       geom_point() +
       labs(title = title) +
       geom_smooth(method = lm, se = TRUE) +
+      theme(axis.text.x = element_text(angle = 0, hjust = 1, size = 10)) +
+      theme(axis.text.y = element_text(angle = 0, hjust = 1, size = 10)) +
       annotate(
         "text", label = glue("Pvalue: {round(res$p.value, digits = 3)} and Correlation Coefficient: {round(res$estimate, digits = 3)}"),
         x = -Inf, y = -Inf, hjust = 0, vjust = 0, size = 8, colour = "blue"
@@ -188,15 +190,19 @@ function(input, output, session) {
       geom_point() +
       labs(title = title) +
       geom_smooth(method = lm, se = TRUE) +
+      theme(axis.text.x = element_text(angle = 0, hjust = 1, size = 10)) +
+      theme(axis.text.y = element_text(angle = 0, hjust = 1, size = 10)) +
       annotate(
         "text", label = glue("Pvalue: {round(res$p.value, digits = 3)} and Correlation Coefficient: {round(res$estimate, digits = 3)}"),
         x = -Inf, y = -Inf, hjust = 0, vjust = 0, size = 8, colour = "blue"
-      )
+      ) 
     
   })
   
   
-  output$heatmapPlot <- renderPlot({
+  output$heatmapPlot <- renderPlot(width = "auto",
+                                   height = "auto",
+                                   {
     
     plot_heat <- wellbeing_dropped
     
@@ -222,10 +228,12 @@ function(input, output, session) {
       scale_fill_gradient2(low = "red", high = "blue",
                            limit = c(-1,1), name="Correlation") +
       geom_text(aes(X2, X1, label = round(value, digits = 3)), size = 3) +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10)) +
+      theme(axis.text.y = element_text(angle = 45, hjust = 1, size = 10))
+
     
   })
-
+  
     
   output$tableTable <- renderDataTable({
     
@@ -274,7 +282,7 @@ function(input, output, session) {
       labs(title = "All Variables Correlation with Life Satisfaction",
            x = "Variables", 
            y = "correlation") +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1))
+      theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10))
     
     
     

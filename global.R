@@ -14,6 +14,7 @@ library(datasets)
 library(ggpubr)
 library(bslib)
 # install.packages("rsconnect")
+library(rsconnect)
 
 
 wellbeing <- read_csv("data/df.csv")

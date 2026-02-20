@@ -26,15 +26,16 @@ fluidPage(
   # Show a plot of the generated distribution
   mainPanel(
     
-    
+    # style="height: 675px; width: 800px"
     
     tabsetPanel(
       tabPanel(
         "Welcome",
         HTML(r"(
              <br>
-             <img src="https://i.ibb.co/My7tcjHZ/wellbeing-image-06.jpg" alt="wellbeing image 06" border="0">
-             
+             <img src="https://i.ibb.co/My7tcjHZ/wellbeing-image-06.jpg" style="height: auto; max-height:100%; max-width: 100%" alt="wellbeing image 06" border="0">
+    
+                      
         )"),
       ),
       tabPanel(
@@ -68,6 +69,8 @@ fluidPage(
         
       ),
       
+      
+      
       tabPanel(
         
         "Data",
@@ -75,22 +78,22 @@ fluidPage(
         
         tags$br(),
         tags$br(),
-
+        
         tags$h4("Where does the data comes from?"),
         
         tags$br(),
         
         tags$h6("First the data I worked with was pulled from the :"),
         tags$a(href = "https://data-explorer.oecd.org/", "Organisation for Economic Co-operation and Development Data Explorer"),
-      
+        
         tags$br(),
         tags$br(),
-
+        
         tags$h6("You can find exceptionally detailed definitions and metadata on the datasets I used here:"),
         tags$a(href = "https://www.oecd.org/content/dam/oecd/en/topics/policy-sub-issues/measuring-well-being-and-progress/oecd-well-being-database-definitions.pdf", "The OECD Data sets Definitions and metadata are provided here."),
         tags$br(),
         tags$br(),
-
+        
         
         HTML(r"(<div class="accordion" id="accordionExample">
   
@@ -231,7 +234,7 @@ fluidPage(
 
 </div>)"),
 
-),
+      ),
 
 tabPanel(
   "Table",
@@ -254,7 +257,7 @@ tabPanel(
       
     ),
     mainPanel(
-      dataTableOutput("tableTable")
+      dataTableOutput("tableTable", width = "100%")
     )
   )
 ),
@@ -264,7 +267,7 @@ tabPanel(
   sidebarLayout(
     sidebarPanel(
       
-     
+      
       uiOutput(
         "hist_bins2"
       ),
@@ -294,7 +297,7 @@ tabPanel(
       
     ),
     mainPanel(
-      plotOutput("distPlot2"),
+      plotOutput("distPlot2", width = "100%"),
       hr(),
     )
   )
@@ -419,9 +422,9 @@ tabPanel(
     ),
     
     mainPanel(
-      plotOutput("scatPlot1"),
+      plotOutput("scatPlot1", width = "100%"),
       hr(),
-      plotOutput("scatPlot2"),
+      plotOutput("scatPlot2", width = "100%"),
       hr(),
     )
     
@@ -471,7 +474,7 @@ tabPanel(
     ),
     
     mainPanel(
-      plotOutput("heatmapPlot")
+      plotOutput("heatmapPlot", width = "100%")
       
       
     )
@@ -491,7 +494,7 @@ tabPanel(
       tags$h6("Countries whose populations identify as having bad or even fair health are more strongly negatively correlated with life satisfaction than intentional homicides."),
       tags$br(),
       tags$h6("Life satisfaction appears more strongly associated with emotional security than with physical safety at the national level."),
-
+      
       
     ),
     
@@ -499,7 +502,7 @@ tabPanel(
       tags$br(),
       tags$h6("Are social support and loneliness stronger predictors of life satisfaction than crime rates? "),
       tags$br(),
-      plotOutput("confintPlot"),
+      plotOutput("confintPlot", width = "100%"),
       
       
     )
