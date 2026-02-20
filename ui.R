@@ -33,7 +33,8 @@ fluidPage(
         "Welcome",
         HTML(r"(
              <br>
-             <img src="https://i.ibb.co/5xc2Sgd7/wellbeing-image-04.png" alt="wellbeing image 04" border="0">
+             <img src="https://i.ibb.co/My7tcjHZ/wellbeing-image-06.jpg" alt="wellbeing image 06" border="0">
+             
         )"),
       ),
       tabPanel(
@@ -282,11 +283,12 @@ tabPanel(
       selectInput("hist_variable2",
                   "Select Variable to Display:",
                   choices = c(
+                    "Satisfaction with Life" = "OBS_VALUE_SAT",
                     "Perceived Health Status" = "OBS_VALUE_PHS", 
                     "Educational Attainment" = "OBS_VALUE_EL", 
                     "Safety" = "OBS_VALUE_SAFETY", 
-                    "Social" = "OBS_VALUE_SOCIAL", 
-                    "Satisfaction with Life" = "OBS_VALUE_SAT"
+                    "Social" = "OBS_VALUE_SOCIAL" 
+                    
                   ),
       )
       
@@ -297,32 +299,6 @@ tabPanel(
     )
   )
 ),
-
-
-# tabPanel(
-#   
-#   "Question of the Data",
-#   
-#   HTML(r"(
-#               <br>
-#               <br>
-#             
-#             <p> Are social support and loneliness stronger predictors of life satisfaction than crime rates/safety?
-#         )"),
-#   
-  # tags$br(),
-  # 
-  # tags$figure(),
-  # tags$blockquote('"Connection is why we're here. We are hardwired to connect with others, it's what gives purpose and meaning to our lives, and without it there is suffering.\n ~Brené Brown"'),
-  # # tags$figcaption("Brené Brown"),
-  # 
-  # tags$br(),
-  # tags$br(),
-  # 
-  # tags$h4("Are social support and loneliness stronger predictors of life satisfaction than crime rates/safety?"),
-  
-  
-# ),
 
 
 tabPanel(
@@ -511,14 +487,18 @@ tabPanel(
     sidebarPanel(
       
       tags$h6("While intentional homicide had a slightly higher negative correlation with life satisfaction, when you consider the uncertainty in the estimate, it cannot be said that there is a stronger effect on life satisfaction than feeling lonely does."),
+      tags$br(),
       tags$h6("Countries whose populations identify as having bad or even fair health are more strongly negatively correlated with life satisfaction than intentional homicides."),
+      tags$br(),
       tags$h6("Life satisfaction appears more strongly associated with emotional security than with physical safety at the national level."),
 
       
     ),
     
     mainPanel(
+      tags$br(),
       tags$h6("Are social support and loneliness stronger predictors of life satisfaction than crime rates? "),
+      tags$br(),
       plotOutput("confintPlot"),
       
       

@@ -1,78 +1,9 @@
 function(input, output, session) {
   
  
-  
-  output$scatPlot1 <- renderPlot({
-    
-    
-    
-    plot_variables <- wellbeing_dropped
-    
-    if(input$scatter_country != "All"){
-      plot_variables <- wellbeing_dropped %>% 
-        filter(Reference_area == input$scatter_country)
-      title <- glue("{input$scatter_x} and {input$scatter_y} for {input$scatter_country}")
-    } else if(input$scatter_country == "All"){
-      plot_variables <- wellbeing_dropped
-      title <- glue("{input$scatter_x}")
-    }
-    
-    res <- cor.test(plot_variables[input$scatter_x] %>% 
-                      pull(), 
-                    plot_variables[input$scatter_y] %>% 
-                      pull(), 
-                    method = "pearson")
-    
-    ggplot(
-      plot_variables, aes(x=.data[[input$scatter_x]], y = .data[[input$scatter_y]])) + 
-      geom_point() +
-      labs(title = title) +
-      geom_smooth(method = lm, se = TRUE) +
-      annotate(
-        "text", label = glue("Pvalue: {round(res$p.value, digits = 3)} and Correlation Coefficient: {round(res$estimate, digits = 3)}"),
-        x = -Inf, y = -Inf, hjust = 0, vjust = 0, size = 8, colour = "blue"
-      )
-    
-  })
-
-  
-  output$scatPlot2 <- renderPlot({
-    
-
-    
-    plot_variables <- wellbeing_dropped
-    
-    if(input$scatter_country2 != "All"){
-      plot_variables <- wellbeing_dropped %>% 
-        filter(Reference_area == input$scatter_country2)
-      title <- glue("{input$scatter_x2} and {input$scatter_y2} for {input$scatter_country2}")
-    } else if(input$scatter_country2 == "All"){
-      plot_variables <- wellbeing_dropped
-      title <- glue("{input$scatter_x2}")
-    }
-    
-    res <- cor.test(plot_variables[input$scatter_x2] %>% 
-                      pull(), 
-                    plot_variables[input$scatter_y2] %>% 
-                      pull(), 
-                    method = "pearson") 
-    
-    ggplot(
-      plot_variables, aes(x=.data[[input$scatter_x2]], y = .data[[input$scatter_y2]])) + 
-      geom_point() +
-      labs(title = title) +
-      geom_smooth(method = lm, se = TRUE) +
-      annotate(
-        "text", label = glue("Pvalue: {round(res$p.value, digits = 3)} and Correlation Coefficient: {round(res$estimate, digits = 3)}"),
-        x = -Inf, y = -Inf, hjust = 0, vjust = 0, size = 8, colour = "blue"
-      )
-    
-  })
-
-    
-  output$hist_bins <- renderUI({
-    sliderInput("bins",
-                "Number of bins:",
+  output$hist_bins2 <- renderUI({
+    sliderInput("bins2",
+                "Number of bins for Faceted Histogram:",
                 min = 0,
                 max = 50,
                 value = 10)
@@ -90,7 +21,7 @@ function(input, output, session) {
          q
         ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Health_status, color = Health_status)) +
           geom_line() +
-          labs(y="% of the pop with respective levels of health", title = title)
+          labs(x = "Time Period", y="% of the pop with respective levels of health", title = title)
         
       } else if(input$hist_country2 == 'All'){
         plot_data <- phs_grouped
@@ -112,7 +43,7 @@ function(input, output, session) {
         
         ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Edu_attainment_lvl, color = Edu_attainment_lvl)) +
           geom_line() +
-          labs(y="% of the pop with respective levels of education", title = title)
+          labs(x = "Time Period", y="% of the pop with respective levels of education", title = title)
         
       } else if(input$hist_country2 == 'All'){
         plot_data <- el_grouped
@@ -134,7 +65,7 @@ function(input, output, session) {
         
         ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Measure_safety, color = Measure_safety)) +
           geom_line() +
-          labs(y="incidents per 100,000 people", title = title)
+          labs(x = "Time Period", y="incidents per 100,000 people", title = title)
         
       } else if(input$hist_country2 == 'All'){
         plot_data <- safety_grouped
@@ -152,11 +83,11 @@ function(input, output, session) {
       if(input$hist_country2 != "All"){
         plot_data <- social_grouped |> 
           filter(Reference_area == input$hist_country2)
-        title <- glue("% of the pop that self-identified as either having or lacking social support for {input$hist_country2}")
+        title <- glue("% of the pop having or lacking social support for {input$hist_country2}")
         
         ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Measure_social, color = Measure_social)) +
           geom_line() +
-          labs(y="% of the population", title = title)
+          labs(x = "Time Period", y="% of the population", title = title)
         
       } else if(input$hist_country2 == 'All'){
         plot_data <- social_grouped
@@ -174,15 +105,15 @@ function(input, output, session) {
       if(input$hist_country2 != "All"){
         plot_data <- sat_life_grouped |> 
           filter(Reference_area == input$hist_country2)
-        title <- glue("% of the pop that identifies as either having or lacking of satisfaction with life for {input$hist_country2}")
+        title <- glue("Mean Values (0-10 scale) for {input$hist_country2}")
         
         ggplot(plot_data, aes(x = TIME_PERIOD, y = .data[[input$hist_variable2]], group = Measure_sat, color = Measure_sat)) +
           geom_line() +
-          labs(y="% of the population", title = title)
+          labs(x = "Time Period", y="Mean Values on a Scale from 0 to 10", title = title)
         
       } else if(input$hist_country2 == 'All'){
         plot_data <- sat_life_grouped
-        title <- glue("Distribution of Satisfaction with life or lack of satisfaction with life")
+        title <- glue("Distribution of Satisfaction with Life and Relationships")
         
         ggplot(plot_data, aes(x=.data[[input$hist_variable2]])) +
           geom_histogram(color="white", fill="salmon", bins = input$bins2) +
@@ -195,12 +126,73 @@ function(input, output, session) {
   })
   
   
-  output$hist_bins2 <- renderUI({
-    sliderInput("bins2",
-                "Number of bins for grouped Histogram:",
-                min = 0,
-                max = 50,
-                value = 10)
+
+  
+  
+  output$scatPlot1 <- renderPlot({
+    
+    
+    plot_variables <- wellbeing_dropped
+    
+    if(input$scatter_country != "All"){
+      plot_variables <- wellbeing_dropped %>% 
+        filter(Reference_area == input$scatter_country)
+      title <- glue("{input$scatter_x} and {input$scatter_y} for {input$scatter_country}")
+    } else if(input$scatter_country == "All"){
+      plot_variables <- wellbeing_dropped
+      title <- glue("{input$scatter_x} and {input$scatter_y} for All Countries")
+    }
+    
+    res <- cor.test(plot_variables[input$scatter_x] %>% 
+                      pull(), 
+                    plot_variables[input$scatter_y] %>% 
+                      pull(), 
+                    method = "pearson")
+    
+    ggplot(
+      plot_variables, aes(x=.data[[input$scatter_x]], y = .data[[input$scatter_y]])) + 
+      geom_point() +
+      labs(title = title) +
+      geom_smooth(method = lm, se = TRUE) +
+      annotate(
+        "text", label = glue("Pvalue: {round(res$p.value, digits = 3)} and Correlation Coefficient: {round(res$estimate, digits = 3)}"),
+        x = -Inf, y = -Inf, hjust = 0, vjust = 0, size = 8, colour = "blue"
+      )
+    
+  })
+  
+  
+  output$scatPlot2 <- renderPlot({
+    
+    
+    
+    plot_variables <- wellbeing_dropped
+    
+    if(input$scatter_country2 != "All"){
+      plot_variables <- wellbeing_dropped %>% 
+        filter(Reference_area == input$scatter_country2)
+      title <- glue("{input$scatter_x2} and {input$scatter_y2} for {input$scatter_country2}")
+    } else if(input$scatter_country2 == "All"){
+      plot_variables <- wellbeing_dropped
+      title <- glue("{input$scatter_x2} and {input$scatter_y2} for All Countries")
+    }
+    
+    res <- cor.test(plot_variables[input$scatter_x2] %>% 
+                      pull(), 
+                    plot_variables[input$scatter_y2] %>% 
+                      pull(), 
+                    method = "pearson") 
+    
+    ggplot(
+      plot_variables, aes(x=.data[[input$scatter_x2]], y = .data[[input$scatter_y2]])) + 
+      geom_point() +
+      labs(title = title) +
+      geom_smooth(method = lm, se = TRUE) +
+      annotate(
+        "text", label = glue("Pvalue: {round(res$p.value, digits = 3)} and Correlation Coefficient: {round(res$estimate, digits = 3)}"),
+        x = -Inf, y = -Inf, hjust = 0, vjust = 0, size = 8, colour = "blue"
+      )
+    
   })
   
   
@@ -279,6 +271,9 @@ function(input, output, session) {
       ggplot(aes(fct_relevel(variable, c("social_support", "lack_of_social_support", "health_status_G", "health_status_F", "health_status_B", "below_upper_secondary_education", "upper_secondary_education", "tertiary_education", "intentional_homicides", "motor_vehicle_theft", "mortality_from_transport_accidents", "satisfaction_w_relationships", "feeling_lonely")), est)) +
       geom_point() +
       geom_errorbar(aes(ymin=lower, ymax=upper)) +
+      labs(title = "All Variables Correlation with Life Satisfaction",
+           x = "Variables", 
+           y = "correlation") +
       theme(axis.text.x = element_text(angle = 90, hjust = 1))
     
     
