@@ -11,7 +11,10 @@
 | Safety/Crime Rates      | Number of incidents per 100,000 people: intentional homicides, motor vehicle thefts, transport related mortalities     |
 | Social Support      | Percentage of the population reporting having friends or relatives whom they can count on in times of trouble: having social support, lacking social support     |
 | Loneliness      | Percentage of the population     |
-| left baz      | right baz     |
 
 
 ## Major Takeaways
+
+## Overview of the project
+## Instructions for running the code
+## Details on the chosen technologies and techniques
